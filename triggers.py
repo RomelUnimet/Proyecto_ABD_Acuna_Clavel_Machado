@@ -42,7 +42,7 @@ def createTriggerAddPointWhenVisit():
     cur.execute(query)
     cur.close()
     conn.commit()
-# createTriggerAddPointWhenVisit()
+createTriggerAddPointWhenVisit()
 
 
 
@@ -55,12 +55,11 @@ def createTriggerAddPointsWhenPurchase():
     CREATE OR REPLACE FUNCTION addPointsWhenPurchase()
     RETURNS trigger AS $$
     DECLARE 
-        store_ integer := (SELECT id_store FROM plaza.bill WHERE _id = NEW.bill_id);
         date_ date := (SELECT datetime FROM plaza.bill WHERE NEW.bill_id=_id)::date;
         price numeric := (SELECT price FROM plaza.price
                           WHERE product_name = NEW.product_name AND
                           date = date_ AND
-                          store_ = id_store
+                          NEW.id_store = id_store
                          );
     BEGIN 
         IF NEW.bill_id IN (SELECT _id FROM plaza.bill, plaza.membership
@@ -94,7 +93,7 @@ def createTriggerAddPointsWhenPurchase():
     cur.close()
     conn.commit()
 
-# createTriggerAddPointsWhenPurchase()
+createTriggerAddPointsWhenPurchase()
 
 
 # THIRD TRIGGER
@@ -139,7 +138,7 @@ def createTriggerAddMembership():
     cur.close()
     conn.commit()
 
-# createTriggerAddMembership()
+createTriggerAddMembership()
 
 
 
@@ -151,12 +150,11 @@ def createTriggerUpdateTotal():
     CREATE OR REPLACE FUNCTION updateTotal()
     RETURNS trigger AS $$
     DECLARE 
-        store_ integer := (SELECT id_store FROM plaza.bill WHERE _id = NEW.bill_id);
         date_ date := (SELECT datetime FROM plaza.bill WHERE NEW.bill_id=_id)::date;
         price numeric := (SELECT price FROM plaza.price
                           WHERE product_name = NEW.product_name AND
                           date = date_ AND
-                          store_ = id_store
+                          NEW.id_store = id_store
                          );
     BEGIN 
         UPDATE plaza.bill
@@ -183,7 +181,7 @@ def createTriggerUpdateTotal():
     cur.close()
     conn.commit()
 
-# createTriggerUpdateTotal()
+createTriggerUpdateTotal()
 
 
 

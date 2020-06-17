@@ -10,59 +10,71 @@ conn = psycopg2.connect(
 
 # query="""
 #     INSERT INTO plaza.client (ci, name, last_name)
-#     VALUES ('v27654322', 'Paola', 'Sollecito'),
-#            ('v27123457', 'Andres', 'Rodriguez'),
-#            ('e27654325', 'Christian', 'Guillen')
+#     VALUES ('v27000000', 'Victoria', 'Acuna'),
+#            ('v27000111', 'Wilfredo', 'Machado'),
+#            ('e27111000', 'Romel', 'Clavel'),
+#            ('e27222000', 'Paola', 'Sollecito'),
+#            ('v27000222', 'Gianluca', 'Di Bella'),
+#            ('e27000000', 'Valeria', 'Trotta'),
+#            ('e27000111', 'Valeska', 'Silva')
+
 # ;"""
 
 # query="""
 #     INSERT INTO plaza.membership (ci, points)
-#     VALUES ('v27654322', 45)
+#     VALUES ('v27000000', 200),
+#            ('e27111000', 50),
+#            ('v27000222', 100)
 # ;"""
 
 # query="""
-#     INSERT INTO plaza.store (max_people, address)
-#     VALUES (10, 'Terrazas del Ávila'),
-#            (15, 'Los Naranjos')
+#     INSERT INTO plaza.store (max_people, address, opening, closing)
+#     VALUES (10, 'Terrazas del Ávila', '9:00:00', '20:00:00'),
+#            (15, 'Los Naranjos', '9:00:00', '20:00:00')
 # ;"""
 
 # query="""
 #     INSERT INTO plaza.product (name, id_store, category)
-#     VALUES ('Manzana', 2, 'Frutas'),
-#            ('Zucaritas', 1, 'Cereales'),
+#     VALUES ('Manzana', 1, 'Frutas'),
+#            ('Zucaritas', 2, 'Cereales'),
+#            ('Papel Toilet', 1, 'Higiene'),
+#            ('Manzana', 2, 'Frutas'),
+#            ('Pera', 1, 'Frutas'),
 #            ('Papel Toilet', 2, 'Higiene')
 
 # ;"""
 
 # query="""
 #     INSERT INTO plaza.price (product_name, id_store, price, cost, date)
-#     VALUES ('Manzana', 2, 500.50, 200, CURRENT_DATE),
-#            ('Manzana', 1, 500, 200, '2020-06-15'),
-#            ('Manzana', 2, 400, 200, '2020-06-15')
+#     VALUES ('Manzana', 1, 300, 100, '2020-06-16'),
+#            ('Manzana', 2, 350, 100, '2020-06-16'),
+#            ('Manzana', 1, 290, 90, '2020-06-15'),
+#            ('Manzana', 2, 300, 90, '2020-06-15')
 
+# ;"""
+
+# query="""
+#     INSERT INTO plaza.bill (client_ci, id_store, account, datetime, total)
+#     VALUES  ('e27000111', 2, 'Banesco', '2020-06-16 10:30.396128', 0)
+            
+
+# ;"""
+
+
+# query="""
+#     INSERT INTO plaza.visit (client_ci, id_store, datetime)
+#     VALUES ('e27000111', 1, '2020-06-17 9:30.396128')
 # ;"""
 
 query="""
-    INSERT INTO plaza.bill (client_ci, id_store, account, datetime, total)
-    VALUES ('e27654321', 1, 'Mercantil', '2020-06-15 02:29:30.396128', 200),
-            ('e27654321', 2, 'Mercantil', '2020-06-15 02:29:30.396128', 200),
-            ('v27123457', 2, 'Mercantil', '2020-06-15 02:29:30.396128', 100),
-            ('v27123457', 2, 'Mercantil', '2020-06-15 03:29:30.396128', 50),
-            ('e27654325', 2, 'Mercantil', '2020-06-15 03:29:30.396128', 50),
-            ('v27654321', 2, 'Mercantil', '2020-06-15 03:29:30.396128', 500),
-            ('v27123456', 1, 'Mercantil', '2020-06-15 05:29:30.396128', 75),
-            ('v27654322', 1, 'Mercantil', '2020-06-15 05:29:30.396128', 50)
-
+    INSERT INTO plaza.bill_product (bill_id, product_name, quantity, id_store)
+    VALUES 
+           (5, 'Pera', 3, 1)
 ;"""
 
 # query="""
-#     INSERT INTO plaza.bill_product (bill_id, product_name, quantity)
-#     VALUES (4, 'Manzana', 1)
-# ;"""
-
-# query="""
-#     DELETE FROM plaza.bill
-#     WHERE _id=3
+#     DELETE FROM plaza.visit
+#     WHERE client_ci='e27000111'
 # ;"""
 
 # query="""
@@ -72,10 +84,13 @@ query="""
 
 # query="""
 #     DELETE FROM plaza.bill_product
-#     WHERE bill_id=1 OR bill_id=2
+#     WHERE bill_id=8
 # ;"""
 
-
+# query="""
+#     DROP TABLE plaza.bill_product, plaza.temperature, plaza.in_stock, plaza.restock, plaza.visit,
+#     plaza.shelf, plaza.bill, plaza.membership, plaza.client, plaza.store, plaza.price, plaza.product
+# ;"""
 
 
 

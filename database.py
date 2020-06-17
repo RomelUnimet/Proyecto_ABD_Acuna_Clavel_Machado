@@ -2,6 +2,7 @@ import psycopg2
 
 
 def createTables():
+    
     commands = (
         """
         CREATE TABLE plaza.client (
@@ -19,65 +20,49 @@ def createTables():
                 ON UPDATE CASCADE ON DELETE CASCADE
         )
         """,
-         """
+        """
         CREATE TABLE plaza.store (
             _id SERIAL PRIMARY KEY,
             max_people INTEGER NOT NULL, 
-            address VARCHAR(50) NOT NULL
+            address VARCHAR(50) NOT NULL,
+            opening time NOT NULL,
+            closing time NOT NULL
         )
         """,
         """
         CREATE TABLE plaza.product (
-            name VARCHAR(30) UNIQUE,
+            name VARCHAR(30),
             id_store INTEGER, 
             category VARCHAR(20) NOT NULL, 
-            PRIMARY KEY (name, id_store),
+            PRIMARY KEY (id_store, name),
             FOREIGN KEY (id_store)
                 REFERENCES plaza.store (_id)
                 ON UPDATE CASCADE
-        )
-        """,
-         """
-        CREATE TABLE plaza.price (
-            product_name VARCHAR(30),
-            id_store INTEGER, 
-            date DATE,
-            price NUMERIC(32, 2) NOT NULL, 
-            cost NUMERIC(32, 2) NOT NULL,
-            PRIMARY KEY (product_name, id_store, date),
-            FOREIGN KEY (id_store)
-                REFERENCES plaza.store (_id)
-                ON UPDATE CASCADE
-                
         )
         """,
         """
-        CREATE TABLE plaza.visit (
-            client_ci VARCHAR(30),
-            id_store INTEGER, 
-            datetime TIMESTAMP, 
-            PRIMARY KEY (client_ci, id_store, datetime),
-            FOREIGN KEY (id_store)
-                REFERENCES plaza.store (_id)
-                ON UPDATE CASCADE,
-            FOREIGN KEY (client_ci)
-                REFERENCES plaza.client (ci)
+        CREATE TABLE plaza.price ( 
+            date DATE,
+            id_store INTEGER,
+            product_name VARCHAR(30),
+            price NUMERIC(32, 2) NOT NULL, 
+            cost NUMERIC(32, 2) NOT NULL,
+            PRIMARY KEY (date, id_store, product_name),
+            FOREIGN KEY (id_store, product_name)
+                REFERENCES plaza.product (id_store, name)
                 ON UPDATE CASCADE
         )
         """,
         """
         CREATE TABLE plaza.shelf (
-            _id SERIAL UNIQUE,
             id_store INTEGER,
-            product_name VARCHAR(30), 
+            _id SERIAL,
+            product_name VARCHAR(30) NOT NULL, 
             capacity INTEGER NOT NULL, 
             min_temperature NUMERIC(5,2),
             PRIMARY KEY (id_store, _id),
-            FOREIGN KEY (id_store)
-                REFERENCES plaza.store (_id)
-                ON UPDATE CASCADE,
-            FOREIGN KEY (product_name)
-                REFERENCES plaza.product (name)
+            FOREIGN KEY (product_name, id_store)
+                REFERENCES plaza.product (name, id_store)
                 ON UPDATE CASCADE
         )
         """,
@@ -87,12 +72,9 @@ def createTables():
             id_store INTEGER,
             datetime TIMESTAMP, 
             qty_available INTEGER NOT NULL,
-            PRIMARY KEY (shelf_id, id_store, datetime),
-            FOREIGN KEY (id_store)
-                REFERENCES plaza.store (_id)
-                ON UPDATE CASCADE,
-            FOREIGN KEY (shelf_id)
-                REFERENCES plaza.shelf (_id)
+            PRIMARY KEY (datetime, id_store, shelf_id),
+            FOREIGN KEY (id_store, shelf_id)
+                REFERENCES plaza.shelf (id_store, _id)
                 ON UPDATE CASCADE
         )
         """,
@@ -101,12 +83,9 @@ def createTables():
             shelf_id INTEGER,
             id_store INTEGER,
             datetime TIMESTAMP, 
-            PRIMARY KEY (shelf_id, id_store, datetime),
-            FOREIGN KEY (id_store)
-                REFERENCES plaza.store (_id)
-                ON UPDATE CASCADE,
-            FOREIGN KEY (shelf_id)
-                REFERENCES plaza.shelf (_id)
+            PRIMARY KEY (datetime, id_store, shelf_id),
+            FOREIGN KEY (id_store, shelf_id)
+                REFERENCES plaza.shelf (id_store, _id)
                 ON UPDATE CASCADE
         )
         """,
@@ -116,12 +95,23 @@ def createTables():
             id_store INTEGER,
             datetime TIMESTAMP, 
             temperature NUMERIC(5,2) NOT NULL,
-            PRIMARY KEY (shelf_id, id_store, datetime),
+            PRIMARY KEY (datetime, id_store, shelf_id),
+            FOREIGN KEY (id_store, shelf_id)
+                REFERENCES plaza.shelf (id_store, _id)
+                ON UPDATE CASCADE
+        )
+        """,
+        """
+        CREATE TABLE plaza.visit (
+            client_ci VARCHAR(30),
+            id_store INTEGER, 
+            datetime TIMESTAMP, 
+            PRIMARY KEY (datetime, id_store, client_ci),
             FOREIGN KEY (id_store)
                 REFERENCES plaza.store (_id)
                 ON UPDATE CASCADE,
-            FOREIGN KEY (shelf_id)
-                REFERENCES plaza.shelf (_id)
+            FOREIGN KEY (client_ci)
+                REFERENCES plaza.client (ci)
                 ON UPDATE CASCADE
         )
         """,
@@ -146,17 +136,18 @@ def createTables():
         CREATE TABLE plaza.bill_product (
             bill_id INTEGER, 
             product_name VARCHAR(30),
+            id_store INTEGER,
             quantity INTEGER NOT NULL,
             PRIMARY KEY (bill_id, product_name),
             FOREIGN KEY (bill_id)
                 REFERENCES plaza.bill (_id)
                 ON UPDATE CASCADE,
-            FOREIGN KEY (product_name)
-                REFERENCES plaza.product (name)
+            FOREIGN KEY (id_store, product_name)
+                REFERENCES plaza.product (id_store, name)
                 ON UPDATE CASCADE
             
         )
-        """,
+        """
     )
     # Connect to de DB
     conn = psycopg2.connect(

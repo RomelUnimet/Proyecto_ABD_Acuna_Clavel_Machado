@@ -40,9 +40,9 @@ def select(query):
 #         return records
 
 # FIRST QUERY
-# 1.1 QUERY THAT FINDS THE CLIENTS WHO HAVE SPENT MORE MONEY.
+# 1.1 Query that finds the clients who have spent more money.
 
-def topClientsMoney():
+def findTopClientsMoney():
     query="""
     WITH data AS (
         WITH top3MemberStore1 AS (
@@ -100,13 +100,13 @@ def topClientsMoney():
     ;"""
     print(select(query))
 
-# topClientsMoney()
+# findTopClientsMoney()
 
 
 # FIRST QUERY
-# 1.2 QUERY THAT FINDS THE CLIENTS WHO HAVE MADE MORE PURCHASES.
+# 1.2 Query that finds the clients who have made more purchases.
 
-def topClientsPurchases():
+def findTopClientsPurchases():
     query="""
     WITH data AS (
         WITH top3MemberStore1 AS (
@@ -163,6 +163,43 @@ def topClientsPurchases():
     ;"""
     print(select(query))
 
-# topClientsPurchases()
+# findTopClientsPurchases()
 
 
+# SECOND QUERY
+# Query that finds the least popular category.
+
+def findLeastPopularCategory():
+    query = """
+        WITH data AS (
+            WITH leastPopularStore1 AS (
+                SELECT plaza.product.category AS category, SUM(plaza.bill_product.quantity) AS sales, plaza.bill_product.id_store 
+                AS store FROM plaza.bill_product, plaza.product
+                WHERE plaza.bill_product.product_name = plaza.product.name AND
+                    plaza.bill_product.id_store = plaza.product.id_store AND
+                    plaza.bill_product.id_store = 1
+                GROUP BY category, store
+                ORDER BY sales ASC
+                LIMIT 1
+            ),
+            leastPopularStore2 AS (
+                SELECT plaza.product.category AS category, SUM(plaza.bill_product.quantity) AS sales, plaza.bill_product.id_store 
+                AS store FROM plaza.bill_product, plaza.product
+                WHERE plaza.bill_product.product_name = plaza.product.name AND
+                    plaza.bill_product.id_store = plaza.product.id_store AND
+                    plaza.bill_product.id_store = 2
+                GROUP BY category, store
+                ORDER BY sales ASC
+                LIMIT 1
+            )
+            SELECT * FROM leastPopularStore1
+            UNION
+            SELECT * FROM leastPopularStore2
+        )
+        SELECT * FROM data
+        ORDER BY store ASC
+    ;"""
+    print(select(query))
+
+
+findLeastPopularCategory()
