@@ -10,15 +10,14 @@ conn = psycopg2.connect(
 
 # query="""
 #     INSERT INTO plaza.client (ci, name, last_name)
-#     VALUES ('v27654321', 'Victoria', 'Acuna'),
-#            ('v27123456', 'Wilfredo', 'Machado'),
-#            ('e27654321', 'Romel', 'Clavel')
+#     VALUES ('v27654322', 'Paola', 'Sollecito'),
+#            ('v27123457', 'Andres', 'Rodriguez'),
+#            ('e27654325', 'Christian', 'Guillen')
 # ;"""
 
 # query="""
 #     INSERT INTO plaza.membership (ci, points)
-#     VALUES ('v27654321', 0),
-#            ('v27123456', 10)
+#     VALUES ('v27654322', 45)
 # ;"""
 
 # query="""
@@ -43,11 +42,18 @@ conn = psycopg2.connect(
 
 # ;"""
 
-# query="""
-#     INSERT INTO plaza.bill (client_ci, id_store, account, datetime, total)
-#     VALUES ('e27654321', 1, 'Mercantil', '2020-06-15 02:29:30.396128', 0)
+query="""
+    INSERT INTO plaza.bill (client_ci, id_store, account, datetime, total)
+    VALUES ('e27654321', 1, 'Mercantil', '2020-06-15 02:29:30.396128', 200),
+            ('e27654321', 2, 'Mercantil', '2020-06-15 02:29:30.396128', 200),
+            ('v27123457', 2, 'Mercantil', '2020-06-15 02:29:30.396128', 100),
+            ('v27123457', 2, 'Mercantil', '2020-06-15 03:29:30.396128', 50),
+            ('e27654325', 2, 'Mercantil', '2020-06-15 03:29:30.396128', 50),
+            ('v27654321', 2, 'Mercantil', '2020-06-15 03:29:30.396128', 500),
+            ('v27123456', 1, 'Mercantil', '2020-06-15 05:29:30.396128', 75),
+            ('v27654322', 1, 'Mercantil', '2020-06-15 05:29:30.396128', 50)
 
-# ;"""
+;"""
 
 # query="""
 #     INSERT INTO plaza.bill_product (bill_id, product_name, quantity)
@@ -64,10 +70,10 @@ conn = psycopg2.connect(
 #     WHERE client_ci='v27654321'
 # ;"""
 
-query="""
-    DELETE FROM plaza.bill_product
-    WHERE bill_id=1 OR bill_id=2
-;"""
+# query="""
+#     DELETE FROM plaza.bill_product
+#     WHERE bill_id=1 OR bill_id=2
+# ;"""
 
 
 
