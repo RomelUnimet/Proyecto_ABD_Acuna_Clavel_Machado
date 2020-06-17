@@ -100,7 +100,7 @@ def topClientsMoney():
     ;"""
     print(select(query))
 
-topClientsMoney()
+# topClientsMoney()
 
 
 # FIRST QUERY
@@ -163,6 +163,6 @@ def topClientsPurchases():
     ;"""
     print(select(query))
 
-topClientsPurchases()
+# topClientsPurchases()
 
 
