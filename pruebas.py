@@ -45,18 +45,30 @@ conn = psycopg2.connect(
 
 # query="""
 #     INSERT INTO plaza.bill (client_ci, id_store, account, datetime, total)
-#     VALUES ('e27654321', 1, 'Mercantil', '2020-06-15 02:29:30.186127', 0)
+#     VALUES ('e27654321', 1, 'Mercantil', '2020-06-15 02:29:30.396128', 0)
+
 # ;"""
 
-query="""
-    INSERT INTO plaza.bill_product (bill_id, product_name, quantity)
-    VALUES (4, 'Manzana', 1)
-;"""
+# query="""
+#     INSERT INTO plaza.bill_product (bill_id, product_name, quantity)
+#     VALUES (4, 'Manzana', 1)
+# ;"""
 
 # query="""
 #     DELETE FROM plaza.bill
 #     WHERE _id=3
 # ;"""
+
+# query="""
+#     DELETE FROM plaza.bill
+#     WHERE client_ci='v27654321'
+# ;"""
+
+query="""
+    DELETE FROM plaza.bill_product
+    WHERE bill_id=1 OR bill_id=2
+;"""
+
 
 
 

@@ -94,7 +94,53 @@ def createTriggerAddPointsWhenPurchase():
     cur.close()
     conn.commit()
 
-createTriggerAddPointsWhenPurchase()
+# createTriggerAddPointsWhenPurchase()
+
+
+# THIRD TRIGGER
+# Trigger that makes a client a member when she/he has made more than four visits.
+def createTriggerAddMembership():
+
+    query = """
+    CREATE OR REPLACE FUNCTION addMembership()
+    RETURNS trigger AS $$
+    DECLARE
+        purchases numeric := (SELECT COUNT(client_ci) FROM plaza.bill WHERE client_ci = NEW.client_ci);
+    BEGIN 
+        IF NEW.client_ci NOT IN (
+            SELECT ci FROM plaza.membership
+            WHERE ci = NEW.client_ci 
+        )
+        THEN
+            IF (purchases>4)
+            THEN
+                INSERT INTO plaza.membership (ci, points)
+                VALUES (NEW.client_ci, 0);
+            END IF;
+        END IF;
+        RETURN NEW;
+    END;
+    $$ LANGUAGE plpgsql;
+    ;"""
+
+    cur = conn.cursor()
+    cur.execute(query)
+    cur.close()
+    conn.commit()
+
+    query = """
+    CREATE TRIGGER addMembership
+    AFTER INSERT ON plaza.bill
+        FOR EACH ROW 
+            EXECUTE PROCEDURE addMembership()       
+    ;"""
+    cur = conn.cursor()
+    cur.execute(query)
+    cur.close()
+    conn.commit()
+
+# createTriggerAddMembership()
+
 
 
 # ADDITIONAL TRIGGERS 
@@ -137,20 +183,17 @@ def createTriggerUpdateTotal():
     cur.close()
     conn.commit()
 
+# createTriggerUpdateTotal()
 
-createTriggerUpdateTotal()
 
-# query="DROP TRIGGER addPointsWhenPurchase ON plaza.bill_product"
+
+
 # cur = conn.cursor()
-# cur.execute(query)
+# cur.execute("DROP TRIGGER addMembership ON plaza.visit")
 # cur.close()
 # conn.commit()
 
-# query="DROP TRIGGER updateTotal ON plaza.bill_product"
-# cur = conn.cursor()
-# cur.execute(query)
-# cur.close()
-# conn.commit()
+
 
 
 
