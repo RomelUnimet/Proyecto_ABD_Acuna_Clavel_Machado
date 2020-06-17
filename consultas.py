@@ -240,4 +240,45 @@ def findMostPopularProducts():
     print(select(query))
 
 
-findMostPopularProducts()
+# findMostPopularProducts()
+
+
+
+#SIXTH QUERY
+# Query that finds the clients who have paid with two types of account during the last week.
+def findClientsWithMoreThanTwoAccounts():
+    query="""
+
+        WITH accounts AS (
+    
+            WITH qty AS (
+                SELECT client_ci AS client, account FROM plaza.bill
+                WHERE DATE_PART('day', current_date::timestamp - plaza.bill.datetime::timestamp) <= 7
+                GROUP BY client, account
+                ORDER BY client, account
+            )
+            SELECT client, COUNT(account) AS accounts FROM qty 
+            GROUP BY client
+            ORDER BY accounts DESC 
+        ), 
+        
+        membership AS (
+        
+            SELECT ci AS client, CASE 
+                        WHEN plaza.client.ci IN (SELECT ci FROM plaza.membership) THEN 'Member'
+                        ELSE 'Unknown client'
+                    END AS membership
+            FROM plaza.client
+            
+        )
+        
+        SELECT accounts.client, accounts.accounts AS qtyOfAccounts, membership.membership FROM accounts, membership
+        WHERE accounts = 2 AND
+            membership.client=accounts.client
+
+    ;"""
+    print(select(query))
+
+findClientsWithMoreThanTwoAccounts()
+
+

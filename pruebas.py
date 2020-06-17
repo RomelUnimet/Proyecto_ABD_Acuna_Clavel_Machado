@@ -46,16 +46,13 @@ conn = psycopg2.connect(
 
 # query="""
 #     INSERT INTO plaza.price (product_name, id_store, price, cost, date)
-#     VALUES ('Manzana', 1, 300, 100, '2020-06-16'),
-#            ('Manzana', 2, 350, 100, '2020-06-16'),
-#            ('Manzana', 1, 290, 90, '2020-06-15'),
-#            ('Manzana', 2, 300, 90, '2020-06-15')
+#     VALUES ('Manzana', 1, 280, 100, '2020-06-12')
 
-# ;"""
+#  ;"""
 
 # query="""
 #     INSERT INTO plaza.bill (client_ci, id_store, account, datetime, total)
-#     VALUES  ('e27000111', 2, 'Banesco', '2020-06-16 10:30.396128', 0)
+#     VALUES  ('v27000000', 1, 'Provincial', '2020-06-12 10:30.396128', 0)
             
 
 # ;"""
@@ -69,7 +66,7 @@ conn = psycopg2.connect(
 query="""
     INSERT INTO plaza.bill_product (bill_id, product_name, quantity, id_store)
     VALUES 
-           (5, 'Pera', 3, 1)
+           (15, 'Manzana', 2, 1)
 ;"""
 
 # query="""
