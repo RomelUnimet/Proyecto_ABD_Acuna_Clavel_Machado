@@ -244,6 +244,60 @@ def findMostPopularProducts():
 
 
 
+
+# FOURTH QUERY
+# 4.1 Query that finds the clients who have made a purchase only in one of the stores during the last week.
+def findClientsWhoHaveMadePurchasesInOneStore():
+    query="""
+
+        WITH data AS (
+    
+            WITH store1 AS (
+
+                SELECT client_ci AS client, id_store AS storeVisited FROM plaza.bill
+                WHERE DATE_PART('day', current_date::timestamp - plaza.bill.datetime::timestamp) <= 7 AND
+                    id_store=1 AND
+                    client_ci NOT IN (
+                        SELECT client_ci AS client FROM plaza.bill
+                            WHERE DATE_PART('day', current_date::timestamp - plaza.bill.datetime::timestamp) <= 7 AND
+                                id_store=2
+                    )
+                GROUP BY client, storeVisited
+                ORDER BY client
+
+            ),
+
+            store2 AS (
+
+                SELECT client_ci AS client, id_store AS storeVisited FROM plaza.bill
+                WHERE DATE_PART('day', current_date::timestamp - plaza.bill.datetime::timestamp) <= 7 AND
+                    id_store=2 AND
+                    client_ci NOT IN (
+                        SELECT client_ci AS client FROM plaza.bill
+                            WHERE DATE_PART('day', current_date::timestamp - plaza.bill.datetime::timestamp) <= 7 AND
+                                id_store=1
+                    )
+                GROUP BY client, storeVisited
+                ORDER BY client
+
+            )
+            SELECT * FROM store1
+            UNION
+            SELECT * FROM store2
+            
+        )
+        SELECT * FROM data
+        ORDER BY storeVisited ASC, client
+
+    ;"""
+    print(select(query))
+
+findClientsWhoHaveMadePurchasesInOneStore()
+
+
+
+
+
 #SIXTH QUERY
 # Query that finds the clients who have paid with two types of account during the last week.
 def findClientsWithMoreThanTwoAccounts():
@@ -279,6 +333,6 @@ def findClientsWithMoreThanTwoAccounts():
     ;"""
     print(select(query))
 
-findClientsWithMoreThanTwoAccounts()
+# findClientsWithMoreThanTwoAccounts()
 
 
