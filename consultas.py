@@ -40,7 +40,7 @@ def select(query):
 #         return records
 
 # FIRST QUERY
-# 1.1 QUERY THAT FINDS THE CLIENTS WHO HAS SPENT MORE MONEY.
+# 1.1 QUERY THAT FINDS THE CLIENTS WHO HAVE SPENT MORE MONEY.
 
 def topClientsMoney():
     query="""
@@ -104,7 +104,7 @@ topClientsMoney()
 
 
 # FIRST QUERY
-# 1.2 QUERY THAT FINDS THE CLIENTS WHO HAS MADE MORE PURCHASES.
+# 1.2 QUERY THAT FINDS THE CLIENTS WHO HAVE MADE MORE PURCHASES.
 
 def topClientsPurchases():
     query="""
@@ -164,3 +164,5 @@ def topClientsPurchases():
     print(select(query))
 
 topClientsPurchases()
+
+
