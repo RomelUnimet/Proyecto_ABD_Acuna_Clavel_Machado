@@ -246,7 +246,8 @@ def findMostPopularProducts():
 
 
 # FOURTH QUERY
-# 4.1 Query that finds the clients who have made a purchase only in one of the stores during the last week.
+# 4.1 Query that finds the clients who have made at least a purchase only in one of the stores during the last week.
+# The query also gives information about what store was visited.
 def findClientsWhoHaveMadePurchasesInOneStore():
     query="""
 
@@ -292,7 +293,37 @@ def findClientsWhoHaveMadePurchasesInOneStore():
     ;"""
     print(select(query))
 
-findClientsWhoHaveMadePurchasesInOneStore()
+# findClientsWhoHaveMadePurchasesInOneStore()
+
+
+
+
+# FOURTH QUERY
+# 4.2 Query that finds the clients who have made at least a purchase in both stores during the last week.
+def findClientsWhoHaveMadePurchasesInTwoStores():
+    query="""
+
+        WITH data AS (
+            WITH stores AS (
+                SELECT client_ci AS client, id_store AS stores FROM plaza.bill
+                WHERE DATE_PART('day', current_date::timestamp - plaza.bill.datetime::timestamp) <= 7
+                GROUP BY client, id_store
+                ORDER BY client, id_store ASC
+            )
+            SELECT client, COUNT(stores) AS qtyOfStores FROM stores
+            GROUP BY client
+        ) 
+        SELECT client FROM data
+        WHERE qtyOfStores=2
+        ORDER BY client
+
+    ;"""
+    print(select(query))
+
+findClientsWhoHaveMadePurchasesInTwoStores()
+
+
+
 
 
 
