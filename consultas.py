@@ -202,4 +202,42 @@ def findLeastPopularCategory():
     print(select(query))
 
 
-findLeastPopularCategory()
+# findLeastPopularCategory()
+
+# THIRD QUERY
+# Query that finds the most popular products.
+
+def findMostPopularProducts():
+    query = """
+        WITH data AS (
+            WITH mostPopularStore1 AS (
+                SELECT plaza.product.name AS name, SUM(plaza.bill_product.quantity) AS sales, plaza.bill_product.id_store 
+                AS store FROM plaza.bill_product, plaza.product
+                WHERE plaza.bill_product.product_name = plaza.product.name AND
+                    plaza.bill_product.id_store = plaza.product.id_store AND
+                    plaza.bill_product.id_store = 1
+                GROUP BY name, store
+                ORDER BY sales DESC
+                LIMIT 5
+            ),
+            mostPopularStore2 AS (
+                SELECT plaza.product.name AS name, SUM(plaza.bill_product.quantity) AS sales, plaza.bill_product.id_store 
+                AS store FROM plaza.bill_product, plaza.product
+                WHERE plaza.bill_product.product_name = plaza.product.name AND
+                    plaza.bill_product.id_store = plaza.product.id_store AND
+                    plaza.bill_product.id_store = 2
+                GROUP BY name, store
+                ORDER BY sales DESC
+                LIMIT 5
+            )
+            SELECT * FROM mostPopularStore1
+            UNION
+            SELECT * FROM mostPopularStore2
+        )
+        SELECT * FROM data
+        ORDER BY store ASC, sales DESC
+    ;"""
+    print(select(query))
+
+
+findMostPopularProducts()
