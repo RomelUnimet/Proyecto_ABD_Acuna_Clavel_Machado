@@ -127,13 +127,12 @@ def createTables():
         """,
         """
         CREATE TABLE plaza.bill (
-            _id SERIAL UNIQUE, 
+            _id SERIAL PRIMARY KEY, 
             id_store INTEGER,
             client_ci VARCHAR(20) NOT NULL,
             account VARCHAR(15) NOT NULL, 
             datetime TIMESTAMP NOT NULL,
             total NUMERIC(32,2),
-            PRIMARY KEY (_id, id_store),
             FOREIGN KEY (id_store)
                 REFERENCES plaza.store (_id)
                 ON UPDATE CASCADE,
