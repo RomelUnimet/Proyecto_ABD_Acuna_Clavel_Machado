@@ -55,10 +55,12 @@ def createTriggerAddPointsWhenPurchase():
     CREATE OR REPLACE FUNCTION addPointsWhenPurchase()
     RETURNS trigger AS $$
     DECLARE 
+        store_ integer := (SELECT id_store FROM plaza.bill WHERE _id = NEW.bill_id);
         date_ date := (SELECT datetime FROM plaza.bill WHERE NEW.bill_id=_id)::date;
         price numeric := (SELECT price FROM plaza.price
                           WHERE product_name = NEW.product_name AND
-                          date = date_
+                          date = date_ AND
+                          store_ = id_store
                          );
     BEGIN 
         IF NEW.bill_id IN (SELECT _id FROM plaza.bill, plaza.membership
@@ -66,8 +68,10 @@ def createTriggerAddPointsWhenPurchase():
                            )
         THEN
             UPDATE plaza.membership
-            SET points = (points+price*0,1)
-            WHERE ci = NEW.client_ci;
+            SET points = CAST( (points+((price*NEW.quantity)*0.1))  AS INT)
+            WHERE ci IN (SELECT client_ci FROM plaza.bill, plaza.membership
+                        WHERE plaza.bill.client_ci = plaza.membership.ci
+                        );
         END IF;
         RETURN NEW;
     END;
@@ -90,7 +94,7 @@ def createTriggerAddPointsWhenPurchase():
     cur.close()
     conn.commit()
 
-# createTriggerAddPointsWhenPurchase()
+createTriggerAddPointsWhenPurchase()
 
 
 # ADDITIONAL TRIGGERS 
@@ -101,14 +105,16 @@ def createTriggerUpdateTotal():
     CREATE OR REPLACE FUNCTION updateTotal()
     RETURNS trigger AS $$
     DECLARE 
+        store_ integer := (SELECT id_store FROM plaza.bill WHERE _id = NEW.bill_id);
         date_ date := (SELECT datetime FROM plaza.bill WHERE NEW.bill_id=_id)::date;
         price numeric := (SELECT price FROM plaza.price
                           WHERE product_name = NEW.product_name AND
-                          date = date_
+                          date = date_ AND
+                          store_ = id_store
                          );
     BEGIN 
         UPDATE plaza.bill
-        SET total = (total+price)
+        SET total = (total+(price*NEW.quantity))
         WHERE NEW.bill_id = _id;
         RETURN NEW;
     END;
@@ -132,7 +138,19 @@ def createTriggerUpdateTotal():
     conn.commit()
 
 
-# createTriggerUpdateTotal()
+createTriggerUpdateTotal()
+
+# query="DROP TRIGGER addPointsWhenPurchase ON plaza.bill_product"
+# cur = conn.cursor()
+# cur.execute(query)
+# cur.close()
+# conn.commit()
+
+# query="DROP TRIGGER updateTotal ON plaza.bill_product"
+# cur = conn.cursor()
+# cur.execute(query)
+# cur.close()
+# conn.commit()
 
 
 
