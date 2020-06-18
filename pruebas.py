@@ -33,16 +33,16 @@ conn = psycopg2.connect(
 #            (15, 'Los Naranjos', '9:00:00', '20:00:00')
 # ;"""
 
-# query="""
-#     INSERT INTO plaza.product (name, id_store, category)
-#     VALUES ('Manzana', 1, 'Frutas'),
-#            ('Zucaritas', 2, 'Cereales'),
-#            ('Papel Toilet', 1, 'Higiene'),
-#            ('Manzana', 2, 'Frutas'),
-#            ('Pera', 1, 'Frutas'),
-#            ('Papel Toilet', 2, 'Higiene')
+query="""
+    INSERT INTO plaza.product (name, id_store, category)
+    VALUES ('Helado de fresa', 1, 'Congelados'),
+           ('Helado de fresa', 2, 'Congelados'),
+           ('Tequeños', 1, 'Congelados'),
+           ('Tequeños', 2, 'Congelados'),
+           ('Helado de chocolate', 1, 'Congelados'),
+           ('Helado de chocolate', 2, 'Congelados')
 
-# ;"""
+;"""
 
 # query="""
 #     INSERT INTO plaza.price (product_name, id_store, price, cost, date)
@@ -90,25 +90,25 @@ conn = psycopg2.connect(
 # ;"""
 
 
-# query="""
-#     INSERT INTO plaza.shelf (id_store, capacity, product_name)
-#     VALUES 
-#            (1, 50, 'Manzana'),
-#            (2, 25, 'Manzana'),
-#            (1, 30, 'Pera'),
-#            (1, 100, 'Papel Toilet'),
-#            (2, 40, 'Zucaritas'),
-#            (2, 80, 'Papel Toilet')
-# ;"""
-
 query="""
-    INSERT INTO plaza.in_stock (shelf_id, id_store, datetime, qty_available)
-    VALUES (3, 1, '2020-06-10 10:59.396128', 40),
-           (3, 1, '2020-06-10 10:10.396128', 47)
+    INSERT INTO plaza.shelf (id_store, capacity, product_name, min_temperature)
+    VALUES 
+           (1, 50, 'Helado de fresa', -19),
+           (2, 25, 'Helado de fresa', -19),
+           (1, 30, 'Helado de chocolate', -19),
+           (2, 30, 'Helado de chocolate', -19),
+           (1, 40, 'Tequeños', -19),
+           (2, 80, 'Tequeños', -19)
+;"""
+
+# query="""
+#     INSERT INTO plaza.in_stock (shelf_id, id_store, datetime, qty_available)
+#     VALUES (3, 1, '2020-06-10 10:59.396128', 40),
+#            (3, 1, '2020-06-10 10:10.396128', 47)
 
 
            
-;"""
+# ;"""
 
 
 # Close the connection
