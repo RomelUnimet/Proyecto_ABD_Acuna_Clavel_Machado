@@ -102,12 +102,10 @@ conn = psycopg2.connect(
 # ;"""
 
 query="""
-    INSERT INTO plaza.restock (shelf_id, id_store, datetime)
-    VALUES (4,1, '2020-06-10 10:30.396128'),
-           (4,1, '2020-06-10 18:30.396128'),
-           (4,1, '2020-06-11 10:30.396128'),
-           (4,1, '2020-06-12 18:30.396128'),
-           (4,1, '2020-06-12 10:30.396128')
+    INSERT INTO plaza.in_stock (shelf_id, id_store, datetime, qty_available)
+    VALUES (3, 1, '2020-06-10 10:59.396128', 40),
+           (3, 1, '2020-06-10 10:10.396128', 47)
+
 
            
 ;"""
