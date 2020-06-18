@@ -25,6 +25,159 @@ def select(query):
         cur.close()
         return records
 
+# FIRST QUESTION.
+# QUESTION: 
+# ¿Cuáles son las categorías de producto que se venden mejor en cada una de las tiendas? Use un pivot table para razonar su respuesta.
+# ANSWER:
+# Para obtener la respuesta a esa pregunta, se realiza lo siguiente. Se crea una view que contendrá tres columnas: 
+# categoría, tienda y cantidad vendida. Cada tupla representa la cantidad total vendida de un producto (Manzana) en la tienda 
+# correspondiente, pero muestra la categoría del producto (Frutas) en vez de su nombre. Las categorías y 
+# las tiendas se repiten en varias tuplas. Se puede ver entonces, que tenemos relacionado todo lo que queremos para realizar 
+# nuestro análisis, sin embargo, no está dispuesto de la forma más entendible y óptima para análisis. 
+# Es por esto que nos valemos de una pivot table, cuya primera columna tiene las dos tiendas; y las categorías ahora son 
+# columnas que se expanden horizontalmente y no se repiten, cuyos valores corresponderán al total comprado de todos los 
+# productos de esa categoría en la tienda correspondiente. 
+# De ese modo, observar cuál categoría se vende mejor en la tienda x, es tan fácil como buscar el mayor valor en la fila 
+# correspondiente de esa tienda y observar el nombre de la columna.
+
+def analyzeCategories():
+
+    query = """ CREATE OR REPLACE VIEW products_cat_selled AS
+    SELECT DISTINCT p.category, x.store, x.sold FROM 
+    (SELECT SUM(bp.quantity) AS sold, bp.id_store AS store, bp.product_name AS product FROM plaza.bill_product AS bp 
+    GROUP BY product,store) AS x INNER JOIN plaza.product AS p ON p.name = x.product ORDER BY store;"""
+
+    cur = conn.cursor()
+    cur.execute(query)
+    cur.close()
+    conn.commit()
+
+    query = """SELECT store, COALESCE(Cereales, 0) AS Cereales, COALESCE(Frutas, 0) AS Frutas, COALESCE(Higiene, 0) AS Higiene
+    FROM   crosstab(
+    'SELECT store, category, SUM(sold)
+        FROM products_cat_selled 
+        GROUP BY 1,2 ORDER BY 1,2;' 
+
+    , $$VALUES ('Cereales'::text), ('Frutas'), ('Higiene')$$
+    ) AS ct (store text, Cereales int, Frutas int, Higiene int);"""
+
+    print(select(query))
+
+# UNCOMMENT THE LINE BELOW TO RUN THE FUNCTION.
+# analyzeCategories()
+
+
+# SECOND QUESTION.
+# QUESTION: 
+# ¿Qué banco, categoría de producto y tienda prefieren los clientes de nuestro programa de afiliados? Razone su respuesta.
+# ANSWER:
+# Para responder esta pregunta creamos un nuevo procedimiento almacenado llamado client_preferences. Este procedimiento retorna
+# 4 columnas: los clientes de nuestro programa de afiliados, y, para cada uno: el banco con el que más ha realizado 
+# transacciones en cualquiera de las tiendas, cuál es la categoría que corresponde a los productos que más ha comprado, 
+# y finalmente la tienda en la que más ha comprado. Tener esta tabla nos da mucha versatilidad para responder la pregunta 
+# de varias formas. Podemos ver las preferencias individuales de cada uno de nuestros clientes, y también podemos:
+# 1.- Obtener qué banco, categoría de producto, y tienda prefieren nuestros clientes afiliados.
+# 2.- Obtener el banco que prefieren nuestros afiliados junto con la cantidad de clientes cuya preferencia es ese banco.
+# 3.- Obtener la categoría que prefieren nuestros afiliados junto con la cantidad de clientes cuya preferencia es esa categoría.
+# 4.- Obtener la tienda que prefieren nuestros afiliados junto con la cantidad de clientes que prefieren es esa tienda.
+# Cada uno de estos querys se presentan debajo de la creación del stored procedure identificados.
+
+# METODO PARA CREAR EL PA
+def client_preferences(argument):
+    query=""" CREATE OR REPLACE FUNCTION client_preferences ()
+    RETURNS TABLE (client varchar(50), bank_of_preference varchar(15), category_of_preference varchar(20), store_of_preference integer) 
+    AS $$ 
+    DECLARE 
+        X RECORD;
+        Y RECORD;
+        Z RECORD;
+        W RECORD;
+    BEGIN
+        
+        FOR X IN (SELECT CONCAT(c.name, ' ', c.last_name) AS full_name, m.ci AS ci FROM plaza.membership AS m 
+        INNER JOIN plaza.client AS c ON c.ci = m.ci) LOOP
+        
+            FOR Y IN (SELECT account AS name_bank, COUNT(account) AS bank FROM plaza.bill WHERE client_ci = X.ci GROUP BY account
+            ORDER BY bank DESC LIMIT 1) LOOP 
+            
+                FOR Z IN (SELECT DISTINCT p.category AS name_cat, aux.sold FROM 
+                (SELECT SUM(bp.quantity) AS sold, bp.product_name AS product FROM plaza.bill_product AS bp 
+                WHERE bp.bill_id IN (SELECT _id FROM plaza.bill WHERE client_ci = X.ci)
+                GROUP BY product) AS aux INNER JOIN plaza.product AS p ON p.name = aux.product ORDER BY sold DESC LIMIT 1) LOOP
+                
+                    FOR W IN (SELECT id_store AS num_store, COUNT(id_store) AS store FROM plaza.bill WHERE client_ci = X.ci GROUP BY num_store
+                    ORDER BY store DESC LIMIT 1) LOOP
+                                
+                        client:= X.full_name;
+                        bank_of_preference:= Y.name_bank;
+                        category_of_preference:= Z.name_cat;
+                        store_of_preference := W.num_store;
+                        RETURN NEXT;
+                        
+                    END LOOP;
+                END LOOP; 
+            END LOOP;	 	 
+        END LOOP;
+    END;
+    $$ 
+    LANGUAGE plpgsql;"""
+    cur = conn.cursor()
+    cur.execute(query)
+    cur.close()
+    conn.commit()
+
+    switcher = {
+        1: one,
+        2: two,
+        3: three,
+        4: four,
+        5: five
+    }
+
+    func = switcher.get(argument, lambda: outOfBounds())
+    return func()
+
+
+def one(): # 1.- Obtener qué banco, categoría de producto, y tienda prefieren nuestros clientes afiliados.
+
+    query= """	 WITH bank AS (SELECT bank_of_preference, COUNT(bank_of_preference) cuenta FROM client_preferences() 
+	 GROUP BY bank_of_preference ORDER BY cuenta DESC LIMIT 1),
+
+	 cat AS (SELECT category_of_preference, COUNT(category_of_preference) cuenta FROM client_preferences() 
+	 GROUP BY category_of_preference ORDER BY cuenta DESC LIMIT 1),
+	 
+	 store AS(SELECT store_of_preference, COUNT(store_of_preference) cuenta FROM client_preferences() 
+	 GROUP BY store_of_preference ORDER BY cuenta DESC LIMIT 1)
+
+	 SELECT bank.bank_of_preference, cat.category_of_preference, store.store_of_preference FROM bank, cat, store"""
+    return print(select(query))
+
+def two(): # 2.- Obtener el banco que prefieren nuestros afiliados junto con la cantidad de clientes cuya preferencia es ese banco.
+    query="""SELECT bank_of_preference, COUNT(bank_of_preference) AS nr_clients FROM client_preferences() 
+    GROUP BY bank_of_preference ORDER BY nr_clients DESC LIMIT 1;"""
+    return print(select(query))
+
+def three():# 3.- Obtener la categoría que prefieren nuestros afiliados junto con la cantidad de clientes cuya preferencia es esa categoría.
+    query="""SELECT category_of_preference, COUNT(category_of_preference) AS nr_clients FROM client_preferences() 
+    GROUP BY category_of_preference ORDER BY nr_clients DESC LIMIT 1;"""
+    return print(select(query))
+
+def four(): # 4.- Obtener la tienda que prefieren nuestros afiliados junto con la cantidad de clientes cuya preferencia es esa tienda.
+    query="""SELECT store_of_preference, COUNT(store_of_preference) AS nr_clients FROM client_preferences() 
+    GROUP BY store_of_preference ORDER BY nr_clients DESC LIMIT 1;"""
+    return print(select(query))
+
+def five(): #5.- Obtener las preferencias individuales de cada uno de nuestros clientes afiliados.
+    query=""" SELECT * FROM client_preferences();"""
+    return print(select(query))
+
+def outOfBounds():
+    return print('Invalid entry to method client_preferences')
+
+# UNCOMMENT THE LINE BELOW TO RUN THE FUNCTION. PARAMETER INT FROM 1 TO 5 DEPENDING OF WHAT QUERY IS DESIRED.
+#TO ANSWER THE QUESTION PARAMETER = 1
+# client_preferences(1)
+
 
 # THIRD QUESTION.
 # QUESTION: 
