@@ -67,4 +67,9 @@ def yesterdayInStock(id_store, shelf_id):
     query=f"SELECT * FROM yesterdayInStock({id_store}, {shelf_id})"
     print(select(query))
 
+
+# Con esto se sabrá el promedio por hora de la disponibilidad del producto en el estante ("shelf") que se especifique de la
+# tienda ("store") elegida. Las horas que no aparecen es porque se mantuvo igual que el registro anterior.
+
+# En este caso, especificó cuál fue el comportamiento de la disponibilidad por hora en el estante 3 de la tienda 1.
 yesterdayInStock(1,3)
