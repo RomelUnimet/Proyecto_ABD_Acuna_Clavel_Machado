@@ -46,7 +46,16 @@ def main():
     time_s_1=datetime.datetime.now().replace(year=time1["year"],month=time1["month"],day=time1["day"])
     time_s_2=datetime.datetime.now().replace(year=time2["year"],month=time2["month"],day=time2["day"])
 
-    #HAY QUE HACER LA MIERDA DE QUE AGARRE SOLAMENTE AL MAYOR PORQUE SINO NO CUADRA
+    #Si por alguna razon estan en dias/mes/año distintos de agarra al mayor
+    if  time_s_1.day!=time_s_2.day and time_s_1.month!=time_s_2.month and time_s_1.year!=time_s_2.year:
+        if time_s_1>time_s_2:
+
+            time_s_2=datetime.datetime.now().replace(year=time_s_1.year,month=time_s_1.month,day=time_s_1.day)   
+        
+        elif time_s_2>time_s_1:
+
+            time_s_1=datetime.datetime.now().replace(year=time_s_2.year,month=time_s_2.month,day=time_s_2.day)
+
 
     #definir los productos de cada tienda
     #nombre y stock
@@ -94,6 +103,9 @@ def main():
         #loop con la duracion del dia
         while(time_s_1.hour>time_close_1 and time_s_2.hour>time_close_2 and len(clients)!=0): #si no hay clientes disponibles se acaba el dia sabrosamente 
             
+
+            #HASTA AQUI COÑO
+
             #if de la tienda 1
             if(time_s_1.hour<time_close_1): 
                 #simulacion entrada random de clientes
@@ -211,8 +223,7 @@ def main():
                             }
 
                             clientmqtt_2.publish('Plazas/stock/tienda_1',json.dumps(payload),qos=2)
-                            #PUBLICADOR MANDA LA SEÑAL DEL STOCK DEL SHELF
-                            #SEÑAL SERA CON EL PROD Y EL NUEVO STOCK Y COMPARA LO DEL 20%
+                            
                         
 
                         #ver si uso dict
@@ -243,31 +254,313 @@ def main():
 
                     #PONER MANERA DE AVANZAR TIEMPO AUNQUE NO HAYAN CLIENTES EN LAS COLAS      
                 print("Pasaron: "+ str(tiempo_trans)+" minutos en la tienda 1" )
+
+
+            #if de la tienda 1
+            if(time_s_2.hour<time_close_2): 
+                #simulacion entrada random de clientes
+
+                #generamos la cantidad
+                cant=random.randint(1,3) #np.random.normal(media,dist) no puede ser neg
+
+                client_select=[]
+                #sacamos de manera random del array de clientes
+                for x in range(cant):
+                    random.shuffle(clients)
+                    cl=clients.pop()
+                    client_select.append(cl)
+                    
+                #loop en donde se mete en cada cola
+                for x in client_select:
+                    if(people_in_2<max_cap_2): 
+
+                        cola_busq_2.append(x)
+                        print(x+" entro a la tienda")
+                        #PUBLICADOR HACE DE LAS SUYAS
+                        #ENVIA MENSAJE CON LA PERSONA QUE ENTRO A LA TIENDA
+                        payload={
+                            "ci":x,
+                            "store":2,
+                            "datetime":time_s_2
+                        }
+
+                        clientmqtt_0.publish('Plaza/camera/tienda_2',json.dumps(payload),qos=0)
+
+
+                        people_in_2=people_in_2+1
+                        print("people in store 2" + str(people_in_2) )
+                    else:
+                        cola_espera_2.append(x)
+                        print(x+" entro a la cola de espera")
+                
+
+
+
+                #CHEQUEO DE LA TEMP
+                #TRAE TODO LOS SHELF QUE TENGAN TEMP CON SU TEMP ACTUAL Y LA SUPUESTA
+                shelf_temp=get_shelf_temp_2()
+                for x in shelf_temp:
+
+                    up=random.randint(0,9)
+                    if up==0:
+                        x["temp_actual"]=x["temp_actual"]+1
+                    
+                    #PUBLICADOR HACE DE LAS SUYAS
+                    payload={
+                        "shelf_id":x["shelf_id"],
+                        "id_store":2,
+                        "datetime":time_s_1,
+                        "temp_actual":x["temp_actual"],
+                        "min_temp":x["min_temp"]
+                    }
+
+                    clientmqtt_0.publish('Plaza/shelf_temperature/tienda_2',json.dumps(payload),qos=0)
+                    
+
+
+
+                #CICLO DE BUSQUEDA Y COMPRA
+                limite_tiempo=15 #sacar despues cual seria buena en MINUTOS FIJO
+                tiempo_trans=0 #tiempo que transcurre en MINUTOS/ EMPIEZA EN 0 #tiene que trancurrir el tiempo
+
+
+                while((len(cola_busq_2)!=0 or len(cola_compra_2)!=0) and tiempo_trans<limite_tiempo):
+                    #if cola busqueda
+                    if(len(cola_busq_2)!=0):
+
+                        #Todavia falta
+                        store_prod_2=get_prod_2() #se saca el array con la actializacion de los stocks en la base de datos
+
+                        cl_b=cola_busq_2.pop()
+                        prod_list=[] #productos del cliente
+
+                        cant_prod=random.randint(1,5) #np.random.normal(media,dist) no puede ser neg
+
+                        #generamos random 
+                        for x in range(cant_prod):
+                            random.shuffle(store_prod_2)
+                            prod=store_prod_2.pop()
+
+                            max_cant_prod=prod["stock"]
+                            quantity=random.randint(1,max_cant_prod) #np.random.normal(media,dist) no puede ser 0 y tiene que ser menos que el stock maximo que se tiene
+
+
+
+                            n={
+                                "prod":prod["name"], #nombre del prod
+                                "quantity":quantity #la cantidad del producto que se toma
+                            }
+
+
+                            prod_list.append(n)
+                            tiempo_trans=tiempo_trans + 1 #"1 minuto por cada producto o algo asi" 
+                            time_s_2=time_s_2+datetime.timedelta(minutes=1)
+                            
+
+                            new_stock_prod=max_cant_prod-quantity
+
+
+                            #Hacer metodo de update al stock y le pasamos (new stock prod)
+
+                            payload={
+                                "shelf_id":prod["shelf_id"],
+                                "id_store":2,
+                                "datetime":time_s_1,
+                                "qty_available":new_stock_prod,
+                                "max":prod["max"]
+                            }
+
+                            clientmqtt_2.publish('Plazas/stock/tienda_2',json.dumps(payload),qos=2)
+                            
+                        
+
+                        #ver si uso dict
+                        client_comp={
+                            "client":cl_b,#cedula
+                            "list":prod_list
+                        }
+
+                        print(str(client_comp["client"])+" obtuvo los productos "+ str(client_comp["list"]))
+                        cola_compra_2.append(client_comp) #seria el cliente con su array de productos
+
+
+                    #if cola compra
+                    if(len(cola_compra_2)!=0):
+                        cl_comp=cola_busq_2.pop()
+
+                        #PA CON EL CLIENTE DE CL_COMP
+
+
+                        people_in_2=people_in_2-1
+                        tiempo_trans=tiempo_trans + len(cl_comp["list"]) #"1 minuto por cada producto o algo asi" 
+                        time_s_2=time_s_2+datetime.timedelta(minutes=len(cl_comp["list"]))
+
+                        if (len(cola_espera_2)!=0):
+                            cola_busq_2.append(cola_espera_2.pop())
+                        print(cl_comp["client"] + "realizo su compra")
+                    
+
+                    #PONER MANERA DE AVANZAR TIEMPO AUNQUE NO HAYAN CLIENTES EN LAS COLAS      
+                print("Pasaron: "+ str(tiempo_trans)+" minutos en la tienda 2" )
             
 
 
             #if de la tienda 2
 
 
+        #EMPIEZA BUSQUEDA Y COMPRA EXPRESS DE LA TIENDA 1
+        while(cola_busq_1!=0 and cola_compra_1!=0):
+
+            if(len(cola_busq_1)!=0):
+                #Todavia falta
+                store_prod_1=get_prod_1() #se saca el array con la actializacion de los stocks en la base de datos
+
+                cl_b=cola_busq_1.pop()
+                prod_list=[] #productos del cliente
+
+                cant_prod=random.randint(1,5) #np.random.normal(media,dist) no puede ser neg
+
+                        #generamos random 
+                for x in range(cant_prod):
+                    random.shuffle(store_prod_1)
+                    prod=store_prod_1.pop()
+
+                    max_cant_prod=prod["stock"]
+                    quantity=random.randint(1,max_cant_prod) #np.random.normal(media,dist) no puede ser 0 y tiene que ser menos que el stock maximo que se tiene
+
+                    n={
+                        "prod":prod["name"], #nombre del prod
+                        "quantity":quantity #la cantidad del producto que se toma
+                    }
+                    prod_list.append(n)
+                    new_stock_prod=max_cant_prod-quantity
+
+                    payload={
+                        "shelf_id":prod["shelf_id"],
+                        "id_store":1,
+                        "datetime":time_s_1,
+                        "qty_available":new_stock_prod,
+                        "max":prod["max"]
+                    }
+
+                    clientmqtt_2.publish('Plazas/stock/tienda_1',json.dumps(payload),qos=2)
+                            
+                        
+
+                        #ver si uso dict
+                client_comp={
+                    "client":cl_b,#cedula
+                    "list":prod_list
+                }
+
+                print(str(client_comp["client"])+" obtuvo los productos "+ str(client_comp["list"]))
+                cola_compra_1.append(client_comp) #seria el cliente con su array de productos
+                time_s_1=time_s_1+datetime.timedelta(minutes=1)
+            
+
+            if(len(cola_compra_1!=0)):
+                cl_comp=cola_busq_1.pop()
+
+                #PA CON EL CLIENTE DE CL_COMP
 
 
+                people_in_1=people_in_1-1
+                time_s_1=time_s_1+datetime.timedelta(minutes=1)
+
+                print(cl_comp["client"] + "realizo su compra")
+
+
+        #EMPIEZA BUSQUEDA Y COMPRA EXPRESS DE LA TIENDA 2
+        while(cola_busq_2!=0 and cola_compra_2!=0):
+
+            if(len(cola_busq_2)!=0):
+                #Todavia falta
+                store_prod_2=get_prod_2() #se saca el array con la actializacion de los stocks en la base de datos
+
+                cl_b=cola_busq_2.pop()
+                prod_list=[] #productos del cliente
+
+                cant_prod=random.randint(1,5) #np.random.normal(media,dist) no puede ser neg
+
+                        #generamos random 
+                for x in range(cant_prod):
+                    random.shuffle(store_prod_2)
+                    prod=store_prod_2.pop()
+
+                    max_cant_prod=prod["stock"]
+                    quantity=random.randint(1,max_cant_prod) #np.random.normal(media,dist) no puede ser 0 y tiene que ser menos que el stock maximo que se tiene
+
+                    n={
+                        "prod":prod["name"], #nombre del prod
+                        "quantity":quantity #la cantidad del producto que se toma
+                    }
+                    prod_list.append(n)
+                    new_stock_prod=max_cant_prod-quantity
+
+                    payload={
+                        "shelf_id":prod["shelf_id"],
+                        "id_store":2,
+                        "datetime":time_s_1,
+                        "qty_available":new_stock_prod,
+                        "max":prod["max"]
+                    }
+
+                    clientmqtt_2.publish('Plazas/stock/tienda_2',json.dumps(payload),qos=2)
+                            
+                        
+
+                        #ver si uso dict
+                client_comp={
+                    "client":cl_b,#cedula
+                    "list":prod_list
+                }
+
+                print(str(client_comp["client"])+" obtuvo los productos "+ str(client_comp["list"]))
+                cola_compra_2.append(client_comp) #seria el cliente con su array de productos
+                time_s_2=time_s_2+datetime.timedelta(minutes=1)
+            
+
+            if(len(cola_compra_2!=0)):
+                cl_comp=cola_busq_2.pop()
+
+                #PA CON EL CLIENTE DE CL_COMP
+
+
+                people_in_2=people_in_2-1
+                time_s_2=time_s_2+datetime.timedelta(minutes=1)
+
+                print(cl_comp["client"] + "realizo su compra")
+        
+
+
+        #Las vaciamos
+        cola_compra_1=[]
+        cola_espera_1=[]
+        cola_busq_1=[]
+        #Las vaciamos
+        cola_compra_2=[]
+        cola_espera_2=[]
+        cola_busq_2=[]
 
 
 
         #CREO QUE ES AQUI  NO ESOTY SEGURO
         #PA FIN DEL DIA
-        if(False): #es un mes se hace el PA del mes
+
+
+        #VAR PARA VER SI PASO AL SIG MES
+        dia_desp_1=time_s_1+datetime.timedelta(days=1)
+        dia_desp_2=time_s_2+datetime.timedelta(days=1)
+
+        if(time_s_1.month!=dia_desp_1.month): #es un mes se hace el PA del mes
+            pa_del_mes=0
+        if(time_s_2.month!=dia_desp_2.month): #es un mes se hace el PA del mes
             pa_del_mes=0
 
-        #FALTA MANERA DE HACER QUE NO PASE UN DIA
-        time_s_1=time_s_1+"un dia"
-
-#FALA HACER LO QUE APSA CUANDO SE ACERCA LA HORA DE CERRAR Y EL CICLO CON T2 EN LA SIMULACION
-
-
-
-
-
+        
+        #PODRIA HACER LO QUE ASEGURA QUE NO SE PASE EL DIA
+        time_s_1=dia_desp_1
+        time_s_2=dia_desp_2
        
 
 def  get_latest_time_1():
@@ -336,7 +629,6 @@ def get_clients():
     print(lista)
     return lista
 
-#FALTA TERMINARLO CUANDO YA TENGA EL NOMBRE
 def get_open_close_1():
     
     sql='''
@@ -380,7 +672,6 @@ def get_open_close_2():
     print(x)
 
     return x  #x     
-
 #PUEDE SER SOLO UNA
 def get_max_in_1():
     
@@ -557,3 +848,8 @@ def get_shelf_temp_2():
     return lista
            
 
+#FALTA
+#POSIBLE MANERA DE ASEGURAR QUE SOLO PASE UN DIA
+#PA DE COMPRA
+#PA DE DIA
+#PA DE MES
