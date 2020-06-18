@@ -63,11 +63,11 @@ conn = psycopg2.connect(
 #     VALUES ('e27000111', 1, '2020-06-17 9:30.396128')
 # ;"""
 
-query="""
-    INSERT INTO plaza.bill_product (bill_id, product_name, quantity, id_store)
-    VALUES 
-           (15, 'Manzana', 2, 1)
-;"""
+# query="""
+#     INSERT INTO plaza.bill_product (bill_id, product_name, quantity, id_store)
+#     VALUES 
+#            (15, 'Manzana', 2, 1)
+# ;"""
 
 # query="""
 #     DELETE FROM plaza.visit
@@ -89,6 +89,28 @@ query="""
 #     plaza.shelf, plaza.bill, plaza.membership, plaza.client, plaza.store, plaza.price, plaza.product
 # ;"""
 
+
+# query="""
+#     INSERT INTO plaza.shelf (id_store, capacity, product_name)
+#     VALUES 
+#            (1, 50, 'Manzana'),
+#            (2, 25, 'Manzana'),
+#            (1, 30, 'Pera'),
+#            (1, 100, 'Papel Toilet'),
+#            (2, 40, 'Zucaritas'),
+#            (2, 80, 'Papel Toilet')
+# ;"""
+
+query="""
+    INSERT INTO plaza.restock (shelf_id, id_store, datetime)
+    VALUES (4,1, '2020-06-10 10:30.396128'),
+           (4,1, '2020-06-10 18:30.396128'),
+           (4,1, '2020-06-11 10:30.396128'),
+           (4,1, '2020-06-12 18:30.396128'),
+           (4,1, '2020-06-12 10:30.396128')
+
+           
+;"""
 
 
 # Close the connection

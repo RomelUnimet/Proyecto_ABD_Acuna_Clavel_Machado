@@ -1,8 +1,7 @@
-# import ssl
-# import sys
+# PLEASE GO TO THE END OF THE FILE AND YOU'LL BE ABLE TO RUN THE QUERIES YOU WANT.
+
+
 import psycopg2
-# import pandas as pd
-# from sqlalchemy import create_engine
 
 # Connect to de DB
 conn = psycopg2.connect(
@@ -29,15 +28,6 @@ def select(query):
         cur.close()
         return records
 
-# def pretty_select(query):
-#     connection_string = 'postgres://{}:{}@{}:5432/{}'.format(user, password, host, dbname)
-#     try:
-#         engine = create_engine(connection_string)
-#         records = pd.read_sql_query(query, engine)
-#     except Exception as e:
-#         print('Error en el query:', e)
-#     else:
-#         return records
 
 # FIRST QUERY
 # 1.1 Query that finds the clients who have spent more money.
@@ -100,7 +90,7 @@ def findTopClientsMoney():
     ;"""
     print(select(query))
 
-# findTopClientsMoney()
+
 
 
 # FIRST QUERY
@@ -163,7 +153,6 @@ def findTopClientsPurchases():
     ;"""
     print(select(query))
 
-# findTopClientsPurchases()
 
 
 # SECOND QUERY
@@ -202,7 +191,7 @@ def findLeastPopularCategory():
     print(select(query))
 
 
-# findLeastPopularCategory()
+
 
 # THIRD QUERY
 # Query that finds the most popular products.
@@ -238,10 +227,6 @@ def findMostPopularProducts():
         ORDER BY store ASC, sales DESC
     ;"""
     print(select(query))
-
-
-# findMostPopularProducts()
-
 
 
 
@@ -293,9 +278,6 @@ def findClientsWhoHaveMadePurchasesInOneStore():
     ;"""
     print(select(query))
 
-# findClientsWhoHaveMadePurchasesInOneStore()
-
-
 
 
 # FOURTH QUERY
@@ -320,12 +302,41 @@ def findClientsWhoHaveMadePurchasesInTwoStores():
     ;"""
     print(select(query))
 
-findClientsWhoHaveMadePurchasesInTwoStores()
 
 
 
+# FIFTH QUERY
+# Query that finds the average of restock per day of every category and shows a message.
 
+def getRestockInformation():
+    query= """
 
+        WITH message AS (
+            WITH data AS (
+
+                SELECT plaza.product.category AS category, COUNT(plaza.restock.shelf_id) AS qtyRestock, plaza.restock.datetime::date AS date
+                FROM plaza.restock
+                INNER JOIN plaza.shelf ON plaza.shelf._id = plaza.restock.shelf_id
+                INNER JOIN plaza.product ON plaza.product.name = plaza.shelf.product_name
+                WHERE plaza.shelf.id_store = plaza.product.id_store
+                GROUP BY category, date
+                ORDER BY date, category
+
+            )
+            SELECT category, CAST(AVG(qtyRestock) AS INT) AS restockPerDay
+            FROM data
+            GROUP BY category
+        )
+        SELECT category, restockPerDay, CASE
+            WHEN restockPerDay>2 THEN 'Deberías revisar la capacidad de estos estantes. Te recomendamos aumentarla.'
+            ELSE
+                'La capacidad de estos estantes es adecuada.'
+            END AS message
+        FROM message
+        ORDER BY restockPerDay DESC, category
+
+    ;"""
+    print(select(query))
 
 
 
@@ -364,6 +375,44 @@ def findClientsWithMoreThanTwoAccounts():
     ;"""
     print(select(query))
 
-# findClientsWithMoreThanTwoAccounts()
 
 
+
+def runQueries():
+    # Please comment the queries you don't want to run.
+
+    # FIRST QUERY
+    # 1.1 Query that finds the clients who have spent more money.
+    findTopClientsMoney()
+
+    # FIRST QUERY
+    # 1.2 Query that finds the clients who have made more purchases.
+    findTopClientsPurchases()
+
+    # SECOND QUERY
+    # Query that finds the least popular category.
+    findLeastPopularCategory()
+
+    # THIRD QUERY
+    # Query that finds the most popular products.
+    findMostPopularProducts()
+
+    # FOURTH QUERY
+    # 4.1 Query that finds the clients who have made at least a purchase only in one of the stores during the last week.
+    # The query also gives information about what store was visited.
+    findClientsWhoHaveMadePurchasesInOneStore()
+
+    # FOURTH QUERY
+    # 4.2 Query that finds the clients who have made at least a purchase in both stores during the last week.
+    findClientsWhoHaveMadePurchasesInTwoStores()
+
+    # FIFTH QUERY
+    # Query that finds the average of restock per day of every category and shows a message.
+    getRestockInformation()
+
+    #SIXTH QUERY
+    # Query that finds the clients who have paid with two types of account during the last week.
+    findClientsWithMoreThanTwoAccounts()
+
+
+runQueries()
