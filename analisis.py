@@ -26,6 +26,64 @@ def select(query):
         return records
 
 
+# THIRD QUESTION.
+# QUESTION: 
+# ¿Qué horas del día son más rentable para cada una de las tiendas? Razone su respuesta.
+# ANSWER:
+# Para saber qué horas del día son más rentables en cada una de las tiendas basta con correr el método "mostProfitableHours".
+# Este método devuelve un mensaje por cada tienda que indica a qué hora tiene el promedio más alto de cantidad facturada ($)
+# y la hora donde existen más clientes. Para esto se vale de un query que agrupa por hora las facturas y saca el promedio
+# de su total y cuenta la cantidad de facturas (que en este caso representarían la cantidad de clientes comprando).
+# Cabe destacar que la hora donde el promedio de facturación es mayor es el dato más relevante, ya que este promedio toma
+# en cuenta el total facturado en cada hora y la cantidad de facturas en dicha hora. Así que es una métrica que ofrece
+# información más relevante.
+
+def mostProfitableHours():
+
+    # "stores" stores the id values of every store.
+    stores=[]
+    # "messages" stores the information of every store.
+    messages=[]
+
+    c = conn.cursor()
+    row = c.execute("select _id from plaza.store")
+    rows = c.fetchall()
+    for row in rows:
+        stores.append(row[0])
+
+    for store in stores:
+        query = f"""
+            WITH maxClients AS (
+                SELECT CAST(EXTRACT(HOUR FROM datetime) AS INT) AS hour
+                FROM plaza.bill
+                WHERE id_store = {store}
+                GROUP BY hour
+                ORDER BY COUNT(total) DESC
+                LIMIT 1
+            ),
+            maxProfit AS (
+                SELECT CAST(EXTRACT(HOUR FROM datetime) AS INT) AS hour
+                FROM plaza.bill
+                WHERE id_store = {store}
+                GROUP BY hour
+                ORDER BY ROUND(AVG(total), 2) DESC
+                LIMIT 1
+            )
+            SELECT maxProfit.hour AS maxProfit, maxClients.hour AS maxClients FROM maxClients, maxProfit
+        ;"""
+        row = c.execute(query)
+        rows = c.fetchall()
+        for row in rows:
+            messages.append(f'La tienda {store}, en promedio, factura más (Bs) a las {row[0]} y tiene un mayor flujo de clientes a las {row[1]}')
+
+    for message in messages:
+        print(message)
+
+# UNCOMMENT THE LINE BELOW TO RUN THE FUNCTION.
+# mostProfitableHours()
+
+
+
 
 # FOURTH QUESTION.
 # QUESTION: 
@@ -72,4 +130,6 @@ def yesterdayInStock(id_store, shelf_id):
 # tienda ("store") elegida. Las horas que no aparecen es porque se mantuvo igual que el registro anterior.
 
 # En este caso, especificó cuál fue el comportamiento de la disponibilidad por hora en el estante 3 de la tienda 1.
-yesterdayInStock(1,3)
+
+# UNCOMMENT THE LINE BELOW TO RUN THE FUNCTION.
+# yesterdayInStock(1,3)
