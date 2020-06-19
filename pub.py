@@ -43,19 +43,24 @@ def main():
 
     #Tiempos con los que comienza la simulacion
     #PONER UN IF PARA QUE COMIENCEN EL MISMO DIA AJURO
-    time_s_1=datetime.datetime.now().replace(year=time1["year"],month=time1["month"],day=time1["day"])
-    time_s_2=datetime.datetime.now().replace(year=time2["year"],month=time2["month"],day=time2["day"])
+    time_s_1=datetime.datetime.now().replace(year=int(time1["year"]),month=int(time1["month"]),day=int(time1["day"]))
+    time_s_2=datetime.datetime.now().replace(year=int(time2["year"]),month=int(time2["month"]),day=int(time2["day"]))
 
-    #Si por alguna razon estan en dias/mes/año distintos de agarra al mayor
-    if  time_s_1.day!=time_s_2.day and time_s_1.month!=time_s_2.month and time_s_1.year!=time_s_2.year:
-        if time_s_1>time_s_2:
+    
+
+    #Si por alguna razon estan en dias/mes/ano distintos de agarra al mayor
+    if(time_s_1.day!=time_s_2.day or time_s_1.month!=time_s_2.month or time_s_1.year!=time_s_2.year):
+
+        if (time_s_1>time_s_2):
 
             time_s_2=datetime.datetime.now().replace(year=time_s_1.year,month=time_s_1.month,day=time_s_1.day)   
         
-        elif time_s_2>time_s_1:
+        elif (time_s_2>time_s_1):
 
             time_s_1=datetime.datetime.now().replace(year=time_s_2.year,month=time_s_2.month,day=time_s_2.day)
 
+    print(time_s_1)
+    print(time_s_2)
 
     #definir los productos de cada tienda
     #nombre y stock
@@ -96,18 +101,20 @@ def main():
         clients=get_clients()
 
         #CAMBIAMOS LA HORA DE LA FECHA A LA HORA DE APERTURA
-        time_s_1=time_s_1.replace(hour=time_open_1)
-        time_s_2=time_s_2.replace(hour=time_open_2)
-
+        time_s_1=time_s_1.replace(hour=time_open_1,minute=0)
+        time_s_2=time_s_2.replace(hour=time_open_2,minute=0)
+        print(time_s_1)
+        print(time_s_2)
 
         #loop con la duracion del dia
-        while(time_s_1.hour>time_close_1 and time_s_2.hour>time_close_2 and len(clients)!=0): #si no hay clientes disponibles se acaba el dia sabrosamente 
+        while(time_s_1.hour<time_close_1 and time_s_2.hour<time_close_2 and len(clients)!=0): #si no hay clientes disponibles se acaba el dia sabrosamente 
             
 
-            #HASTA AQUI COÑO
+            #HASTA AQUI COO
 
             #if de la tienda 1
             if(time_s_1.hour<time_close_1): 
+                print('entro')
                 #simulacion entrada random de clientes
 
                 #generamos la cantidad
@@ -133,7 +140,7 @@ def main():
                         payload={
                             "ci":x,
                             "store":1,
-                            "datetime":time_s_1
+                            "datetime":str(time_s_1)
                         }
 
                         clientmqtt_0.publish('Plaza/camera/tienda_1',json.dumps(payload),qos=0)
@@ -161,7 +168,7 @@ def main():
                     payload={
                         "shelf_id":x["shelf_id"],
                         "id_store":1,
-                        "datetime":time_s_1,
+                        "datetime":str(time_s_1),
                         "temp_actual":x["temp_actual"],
                         "min_temp":x["min_temp"]
                     }
@@ -191,6 +198,7 @@ def main():
                         #generamos random 
                         for x in range(cant_prod):
                             random.shuffle(store_prod_1)
+
                             prod=store_prod_1.pop()
 
                             max_cant_prod=prod["stock"]
@@ -217,7 +225,7 @@ def main():
                             payload={
                                 "shelf_id":prod["shelf_id"],
                                 "id_store":1,
-                                "datetime":time_s_1,
+                                "datetime":str(time_s_1),
                                 "qty_available":new_stock_prod,
                                 "max":prod["max"]
                             }
@@ -231,6 +239,8 @@ def main():
                             "client":cl_b,#cedula
                             "list":prod_list
                         }
+                        #{"client":'asdfasfgsfbg', list:[{"prod":'pera,quiantity:10},{"prod":manzana,quiantity:69}] }
+                        
 
                         print(str(client_comp["client"])+" obtuvo los productos "+ str(client_comp["list"]))
                         cola_compra_1.append(client_comp) #seria el cliente con su array de productos
@@ -238,12 +248,14 @@ def main():
 
                     #if cola compra
                     if(len(cola_compra_1)!=0):
-                        cl_comp=cola_busq_1.pop()
+                        cl_comp=cola_compra_1.pop()
 
                         #PA CON EL CLIENTE DE CL_COMP
 
 
                         people_in_1=people_in_1-1
+                        print('----------------------------------------------------------------------------------')
+                       
                         tiempo_trans=tiempo_trans + len(cl_comp["list"]) #"1 minuto por cada producto o algo asi" 
                         time_s_1=time_s_1+datetime.timedelta(minutes=len(cl_comp["list"]))
 
@@ -256,7 +268,7 @@ def main():
                 print("Pasaron: "+ str(tiempo_trans)+" minutos en la tienda 1" )
 
 
-            #if de la tienda 1
+            #if de la tienda 2
             if(time_s_2.hour<time_close_2): 
                 #simulacion entrada random de clientes
 
@@ -281,7 +293,7 @@ def main():
                         payload={
                             "ci":x,
                             "store":2,
-                            "datetime":time_s_2
+                            "datetime":str(time_s_2)
                         }
 
                         clientmqtt_0.publish('Plaza/camera/tienda_2',json.dumps(payload),qos=0)
@@ -309,7 +321,7 @@ def main():
                     payload={
                         "shelf_id":x["shelf_id"],
                         "id_store":2,
-                        "datetime":time_s_1,
+                        "datetime":str(time_s_2),
                         "temp_actual":x["temp_actual"],
                         "min_temp":x["min_temp"]
                     }
@@ -365,7 +377,7 @@ def main():
                             payload={
                                 "shelf_id":prod["shelf_id"],
                                 "id_store":2,
-                                "datetime":time_s_1,
+                                "datetime":str(time_s_2),
                                 "qty_available":new_stock_prod,
                                 "max":prod["max"]
                             }
@@ -386,7 +398,7 @@ def main():
 
                     #if cola compra
                     if(len(cola_compra_2)!=0):
-                        cl_comp=cola_busq_2.pop()
+                        cl_comp=cola_compra_2.pop()
 
                         #PA CON EL CLIENTE DE CL_COMP
 
@@ -438,7 +450,7 @@ def main():
                     payload={
                         "shelf_id":prod["shelf_id"],
                         "id_store":1,
-                        "datetime":time_s_1,
+                        "datetime":str(time_s_1),
                         "qty_available":new_stock_prod,
                         "max":prod["max"]
                     }
@@ -458,7 +470,7 @@ def main():
                 time_s_1=time_s_1+datetime.timedelta(minutes=1)
             
 
-            if(len(cola_compra_1!=0)):
+            if(len(cola_compra_1)!=0):
                 cl_comp=cola_busq_1.pop()
 
                 #PA CON EL CLIENTE DE CL_COMP
@@ -500,7 +512,7 @@ def main():
                     payload={
                         "shelf_id":prod["shelf_id"],
                         "id_store":2,
-                        "datetime":time_s_1,
+                        "datetime":str(time_s_2),
                         "qty_available":new_stock_prod,
                         "max":prod["max"]
                     }
@@ -729,7 +741,7 @@ def get_prod_1():
 
     for index, row in df.iterrows():
         p={
-            "prod":row["name"],
+            "name":row["name"],
             "stock":row["qty_available"],
             "shelf_id":row["_id"],
             "max":row["capacity"]
@@ -800,8 +812,8 @@ def get_shelf_temp_1():
             "shelf_id":row["shelf_id"],
             "id_store":row["id_store"],
             "datetime":row["datetime"],
-            "temperature":row["temperature"],
-            "min_temperature":row["min_temperature"]
+            "temp_actual":row["temperature"],
+            "min_temp":row["min_temperature"]
         }
         lista.append(p)
         
@@ -836,8 +848,8 @@ def get_shelf_temp_2():
             "shelf_id":row["shelf_id"],
             "id_store":row["id_store"],
             "datetime":row["datetime"],
-            "temperature":row["temperature"],
-            "min_temperature":row["min_temperature"]
+            "temp_actual":row["temperature"],
+            "min_temp":row["min_temperature"]
         }
         lista.append(p)
         
@@ -853,3 +865,8 @@ def get_shelf_temp_2():
 #PA DE COMPRA
 #PA DE DIA
 #PA DE MES
+#CUENTA DE LA COMPRA
+
+
+if __name__ == '__main__':
+   main()

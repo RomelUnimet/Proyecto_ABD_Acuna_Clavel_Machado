@@ -180,8 +180,12 @@ def main():
     client_shelf_temp.connect(host=host) 
     client_fix_temp.connect(host=host) 
 
-    client_camera.loop_forever()
-    client_stock.loop_forever()
-    client_restock.loop_forever()
-    client_shelf_temp.loop_forever()
-    client_fix_temp.loop_forever()
+    client_camera.loop_start()
+    client_stock.loop_start()
+    client_restock.loop_start()
+    client_shelf_temp.loop_start()
+    client_fix_temp.loop_start()
+
+
+if __name__ == '__main__':
+   main()

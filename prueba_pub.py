@@ -25,16 +25,16 @@ def get_prod_1():
             select p."name", i."qty_available",s."_id",s."capacity",i."datetime"  from plaza."product" as p
             inner join plaza.shelf as s on s."product_name"=p."name"
             inner join plaza.in_stock as i on s."_id"=i."shelf_id"
-            where p."id_store"=1 and
-                  s."id_store"=1 and
-                  i."id_store"=1 and
+            where p."id_store"=2 and
+                  s."id_store"=2 and
+                  i."id_store"=2 and
                   i."datetime"= (
 
                       select max(plaza.in_stock."datetime") from plaza.in_stock
                       inner join  plaza.shelf as sh on plaza.in_stock."shelf_id"= sh."_id"
                       where sh."product_name"=p."name" and
-                            sh."id_store"=1 and
-                            p."id_store"=1
+                            sh."id_store"=2 and
+                            p."id_store"=2
                   )
     '''
     df = pd.read_sql_query(sql, conn)
@@ -51,11 +51,9 @@ def get_prod_1():
         }
         lista.append(p)
         
+    
     print(lista)
 
-    print(datetime.datetime.now())
-    var=datetime.datetime.now()+datetime.timedelta(minutes=1)
-    print(var)
 
     return lista
 
@@ -124,4 +122,4 @@ def  get_latest_time_1():
 
     return x
 
-get_latest_time_1()
+get_prod_1()
