@@ -90,16 +90,16 @@ query="""
 # ;"""
 
 
-query="""
-    INSERT INTO plaza.shelf (id_store, capacity, product_name, min_temperature)
-    VALUES 
-           (1, 50, 'Helado de fresa', -19),
-           (2, 25, 'Helado de fresa', -19),
-           (1, 30, 'Helado de chocolate', -19),
-           (2, 30, 'Helado de chocolate', -19),
-           (1, 40, 'Tequeños', -19),
-           (2, 80, 'Tequeños', -19)
-;"""
+# query="""
+#     INSERT INTO plaza.shelf (id_store, capacity, product_name, min_temperature)
+#     VALUES 
+#            (1, 50, 'Helado de fresa', -19),
+#            (2, 25, 'Helado de fresa', -19),
+#            (1, 30, 'Helado de chocolate', -19),
+#            (2, 30, 'Helado de chocolate', -19),
+#            (1, 40, 'Tequeños', -19),
+#            (2, 80, 'Tequeños', -19)
+# ;"""
 
 # query="""
 #     INSERT INTO plaza.in_stock (shelf_id, id_store, datetime, qty_available)
@@ -110,11 +110,22 @@ query="""
            
 # ;"""
 
-
+def select(query):
+    cur = conn.cursor()
+    try:
+        cur.execute(query)
+    except Exception as e:
+        conn.commit()
+        print('Error en el query:', e)
+    else:
+        records = cur.fetchall()
+        cur.close()
+        return records
 # Close the connection
 # conn.close()
-
-cur = conn.cursor()
-cur.execute(query)
-cur.close()
-conn.commit()
+query="SELECT * FROM plaza.shelf"
+print(select(query))
+# cur = conn.cursor()
+# cur.execute(query)
+# cur.close()
+# conn.commit()

@@ -251,7 +251,7 @@ def yesterdayInStock(id_store, shelf_id):
     # stored procedure is created...
     query="""
 
-        CREATE OR REPLACE FUNCTION yesterdayInStock(id_store_ integer, shelf_id_ integer) 
+        CREATE OR REPLACE FUNCTION plaza.yesterdayInStock(id_store_ integer, shelf_id_ integer) 
         RETURNS TABLE (shelf_id integer, product_name character varying, date date, hour numeric, average integer) 
         AS $$
         BEGIN
@@ -275,7 +275,7 @@ def yesterdayInStock(id_store, shelf_id):
     cur.close()
     conn.commit()
 
-    query=f"SELECT * FROM yesterdayInStock({id_store}, {shelf_id})"
+    query=f"SELECT * FROM plaza.yesterdayInStock({id_store}, {shelf_id})"
     print(select(query))
 
 
@@ -285,4 +285,4 @@ def yesterdayInStock(id_store, shelf_id):
 # En este caso, especificó cuál fue el comportamiento de la disponibilidad por hora en el estante 3 de la tienda 1.
 
 # UNCOMMENT THE LINE BELOW TO RUN THE FUNCTION.
-# yesterdayInStock(1,3)
+yesterdayInStock(1,3)
