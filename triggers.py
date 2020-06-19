@@ -13,7 +13,7 @@ conn = psycopg2.connect(
 def createTriggerAddPointWhenVisit():
 
     query = """
-    CREATE OR REPLACE FUNCTION addPointWhenVisit()
+    CREATE OR REPLACE FUNCTION plaza.addPointWhenVisit()
     RETURNS trigger AS $$
     BEGIN 
         IF NEW.client_ci IN (SELECT ci FROM plaza.membership WHERE ci=NEW.client_ci)
@@ -36,13 +36,13 @@ def createTriggerAddPointWhenVisit():
     CREATE TRIGGER addPointWhenVisit
     AFTER INSERT ON plaza.visit
         FOR EACH ROW 
-            EXECUTE PROCEDURE addPointWhenVisit()       
+            EXECUTE PROCEDURE plaza.addPointWhenVisit()       
     ;"""
     cur = conn.cursor()
     cur.execute(query)
     cur.close()
     conn.commit()
-createTriggerAddPointWhenVisit()
+# createTriggerAddPointWhenVisit()
 
 
 
@@ -52,7 +52,7 @@ createTriggerAddPointWhenVisit()
 def createTriggerAddPointsWhenPurchase():
 
     query = """
-    CREATE OR REPLACE FUNCTION addPointsWhenPurchase()
+    CREATE OR REPLACE FUNCTION plaza.addPointsWhenPurchase()
     RETURNS trigger AS $$
     DECLARE 
         date_ date := (SELECT datetime FROM plaza.bill WHERE NEW.bill_id=_id)::date;
@@ -86,14 +86,14 @@ def createTriggerAddPointsWhenPurchase():
     CREATE TRIGGER addPointsWhenPurchase
     AFTER INSERT ON plaza.bill_product
         FOR EACH ROW 
-            EXECUTE PROCEDURE addPointsWhenPurchase()       
+            EXECUTE PROCEDURE plaza.addPointsWhenPurchase()       
     ;"""
     cur = conn.cursor()
     cur.execute(query)
     cur.close()
     conn.commit()
 
-createTriggerAddPointsWhenPurchase()
+# createTriggerAddPointsWhenPurchase()
 
 
 # THIRD TRIGGER
@@ -101,7 +101,7 @@ createTriggerAddPointsWhenPurchase()
 def createTriggerAddMembership():
 
     query = """
-    CREATE OR REPLACE FUNCTION addMembership()
+    CREATE OR REPLACE FUNCTION plaza.addMembership()
     RETURNS trigger AS $$
     DECLARE
         purchases numeric := (SELECT COUNT(client_ci) FROM plaza.bill WHERE client_ci = NEW.client_ci);
@@ -131,14 +131,14 @@ def createTriggerAddMembership():
     CREATE TRIGGER addMembership
     AFTER INSERT ON plaza.bill
         FOR EACH ROW 
-            EXECUTE PROCEDURE addMembership()       
+            EXECUTE PROCEDURE plaza.addMembership()       
     ;"""
     cur = conn.cursor()
     cur.execute(query)
     cur.close()
     conn.commit()
 
-createTriggerAddMembership()
+# createTriggerAddMembership()
 
 
 
@@ -147,7 +147,7 @@ createTriggerAddMembership()
 def createTriggerUpdateTotal():
 
     query = """
-    CREATE OR REPLACE FUNCTION updateTotal()
+    CREATE OR REPLACE FUNCTION plaza.updateTotal()
     RETURNS trigger AS $$
     DECLARE 
         date_ date := (SELECT datetime FROM plaza.bill WHERE NEW.bill_id=_id)::date;
@@ -174,20 +174,32 @@ def createTriggerUpdateTotal():
     CREATE TRIGGER updateTotal
     AFTER INSERT ON plaza.bill_product
         FOR EACH ROW 
-            EXECUTE PROCEDURE updateTotal()       
+            EXECUTE PROCEDURE plaza.updateTotal()       
     ;"""
     cur = conn.cursor()
     cur.execute(query)
     cur.close()
     conn.commit()
 
-createTriggerUpdateTotal()
+# createTriggerUpdateTotal()
 
 
 
 
 # cur = conn.cursor()
-# cur.execute("DROP TRIGGER addMembership ON plaza.visit")
+# cur.execute("DROP TRIGGER addMembership ON plaza.bill")
+# cur.close()
+# conn.commit()
+# cur = conn.cursor()
+# cur.execute("DROP TRIGGER updateTotal ON plaza.bill_product")
+# cur.close()
+# conn.commit()
+# cur = conn.cursor()
+# cur.execute("DROP TRIGGER addPointsWhenPurchase ON plaza.bill_product")
+# cur.close()
+# conn.commit()
+# cur = conn.cursor()
+# cur.execute("DROP TRIGGER addPointWhenVisit ON plaza.visit")
 # cur.close()
 # conn.commit()
 

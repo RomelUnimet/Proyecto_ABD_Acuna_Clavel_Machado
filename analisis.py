@@ -261,7 +261,7 @@ def yesterdayInStock(id_store, shelf_id):
                 CAST(AVG(qty_available) AS INT) AS average
                 FROM plaza.in_stock
                 INNER JOIN plaza.shelf ON plaza.shelf._id = plaza.in_stock.shelf_id 
-                WHERE '2020-06-11'::date - datetime::date = 1 AND
+                WHERE CURRENT_DATE::date - datetime::date = 1 AND
                     plaza.in_stock.id_store = id_store_ AND 
                     plaza.in_stock.shelf_id = shelf_id_
                 GROUP BY plaza.in_stock.shelf_id, date, hour, plaza.shelf.product_name
