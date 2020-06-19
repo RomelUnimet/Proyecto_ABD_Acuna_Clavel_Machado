@@ -21,9 +21,7 @@ conn=psy.connect(host=host, user=user, password=password, dbname=dbname)
 #CLIENTES DE LOS PUBLICADORES// SON 3  CAMARA SHELF Y FRIO
 host_pub = "broker.hivemq.com"
 #Client con qos 0
-clientmqtt_0 = mqtt.Client("Publisher_QoS_0", False)
-clientmqtt_0.qos = 0
-clientmqtt_0.connect(host=host_pub)
+
 #Client con qos 1
 clientmqtt_2 = mqtt.Client("Publisher_QoS_2", False)
 clientmqtt_2.qos = 2
@@ -35,6 +33,9 @@ def on_connect():
     print("Pub connected!")
 
 def main():
+    clientmqtt_0 = mqtt.Client("Publisher_QoS_0", False)
+    clientmqtt_0.qos = 0
+    clientmqtt_0.connect(host=host_pub)
 
     #poner times en hora de apertura del ultimo dia que se hizo una transaccion
     time1=get_latest_time_1()

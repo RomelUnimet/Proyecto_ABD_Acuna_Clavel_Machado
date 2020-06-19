@@ -140,7 +140,7 @@ def cuenta():
 host_pub = "broker.hivemq.com"
 
 clientmqtt = mqtt.Client("Publisher_QoS", False)
-clientmqtt.qos = 2
+clientmqtt.qos = 0
 clientmqtt.connect(host=host_pub)
 
 
@@ -149,7 +149,12 @@ def main():
     payload={
         "algo":"algo"
     }
-    clientmqtt.publish('Plazas/restock/'+ str(1) ,json.dumps(payload),qos=0)
+
+    for x in range(2):
+        print('--------------------------')
+        clientmqtt.publish('Plazas/stock/' ,json.dumps(payload),qos=0)
+        #time.sleep(0.5)
+
 
 
 if __name__ == '__main__':

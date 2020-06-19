@@ -19,17 +19,14 @@ dbname='ftuzkdcj'
 conn=psy.connect(host=host, user=user, password=password, dbname=dbname)
 
 host_pub = "broker.hivemq.com"
-#Client con qos 0
-clientmqtt = mqtt.Client("Publisher_QoS", False)
-clientmqtt.qos = 0
-clientmqtt.connect(host=host_pub)
+
 
 
 
 #CONNECT DE LAS CAMARAS DE ENTRADA
 def on_connect(client, userdata, flags, rc):    
     print('Conectado (%s)' % client._client_id)
-    client.subscribe(topic='Plazas/#', qos = 2) 
+    client.subscribe(topic='Plazas/#', qos = 0) 
 
 
 
@@ -57,48 +54,55 @@ def on_message_stock(client, userdata, message):
     print("Stock de Shelf") 
     print(a) 
 
-    cur = conn.cursor()                             
-    cur.execute("INSERT INTO plaza.in_stock ('shelf_id', 'id_store', 'datetime','qty_available') VALUES (%s, %s, %s, %s);",
-                (a["shelf_id"],a["id_store"],a["datetime"],a["qty_available"]))
-    conn.commit()    
+    #cur = conn.cursor()                             
+    #cur.execute("INSERT INTO plaza.in_stock ('shelf_id', 'id_store', 'datetime','qty_available') VALUES (%s, %s, %s, %s);",
+     #           (a["shelf_id"],a["id_store"],a["datetime"],a["qty_available"]))
+    #conn.commit()    
 
-    percent=(a["qty_available"]/a["max"])*100
+    #percent=(a["qty_available"]/a["max"])*100
 
-    payload={
-        "shelf_id":a["shelf_id"],
-        "id_store":a["id_store"],
-        "datetime":a["datetime"],
-        "max":a["max"]
-    }
+    #payload={
+    #    "shelf_id":a["shelf_id"],
+    #    "id_store":a["id_store"],
+    #    "datetime":a["datetime"],
+    #    "max":a["max"]
+    #}
 
-    if percent<20:
-        cur = conn.cursor()                             
-        cur.execute("INSERT INTO plaza.restock ('shelf_id', 'id_store', 'datetime') VALUES (%s, %s, %s);",
-                (a["shelf_id"],a["id_store"],a["datetime"]))
-        conn.commit()  
+   # if percent<20:
+   #     cur = conn.cursor()                             
+   #     cur.execute("INSERT INTO plaza.restock ('shelf_id', 'id_store', 'datetime') VALUES (%s, %s, %s);",
+   #             (a["shelf_id"],a["id_store"],a["datetime"]))
+   #     conn.commit()  
 
-        var=datetime.datetime.now().replace(year=a["datetime"].year,month=a["datetime"].month,day=a["datetime"].day,hour=a["datetime"].hour,minute=a["datetime"].minute,second=a["datetime"].second)
-        var=var+datetime.timedelta(seconds=1)
-
-
-        cur = conn.cursor()                             
-        cur.execute("INSERT INTO plaza.in_stock ('shelf_id', 'id_store', 'datetime','qty_available') VALUES (%s, %s, %s, %s);",
-                   (a["shelf_id"],a["id_store"],var,a["max"]))
-        conn.commit()  
+       # var=datetime.datetime.now().replace(year=a["datetime"].year,month=a["datetime"].month,day=a["datetime"].day,hour=a["datetime"].hour,minute=a["datetime"].minute,second=a["datetime"].second)
+       # var=var+datetime.timedelta(seconds=1)
 
 
+   #     cur = conn.cursor()                             
+   #     cur.execute("INSERT INTO plaza.in_stock ('shelf_id', 'id_store', 'datetime','qty_available') VALUES (%s, %s, %s, %s);",
+   #                (a["shelf_id"],a["id_store"],var,a["max"]))
+    #    conn.commit()  
+
+    clientmqtt = mqtt.Client("Publisher_QoS", False)
+    clientmqtt.qos = 0
+    clientmqtt.connect(host=host_pub)
 
 
+    payload={"finciono":"finciono"}
    #PEUBA DE SI SE MANDAN DOS
-        #print('antes')
-        #clientmqtt.publish('Plazas/restock/'+ str(1) ,json.dumps(payload),qos=0)    
-        #print('despues')
+
+    time.sleep(0.5)
+    print('antes')
+    clientmqtt.publish('Plazas/restock/',json.dumps(payload),qos=0)    
+    print('despues')
 
 
     #I
 
 def on_message_restock(client, userdata, message):   
+
     a = json.loads(message.payload)
+
     print("Restock de shelf") 
     print(a) 
 
@@ -118,6 +122,9 @@ def on_message_restock(client, userdata, message):
 
 def on_message_shelf_temp(client, userdata, message):
     
+    clientmqtt = mqtt.Client("Publisher_QoS", False)
+    clientmqtt.qos = 0
+    clientmqtt.connect(host=host_pub)
     #payload shelf_id, id_store, datetime, temp_actual, min_temp   
     a = json.loads(message.payload)
     print("Shelf temperature") 
