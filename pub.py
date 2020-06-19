@@ -143,7 +143,8 @@ def main():
                             "datetime":str(time_s_1)
                         }
 
-                        clientmqtt_0.publish('Plaza/camera/tienda_1',json.dumps(payload),qos=0)
+                        
+                        clientmqtt_0.publish('Plazas/camera/tienda_1',json.dumps(payload),qos=0)
 
 
                         people_in_1=people_in_1+1
@@ -173,7 +174,8 @@ def main():
                         "min_temp":x["min_temp"]
                     }
 
-                    clientmqtt_0.publish('Plaza/shelf_temperature/tienda_1',json.dumps(payload),qos=0)
+
+                    clientmqtt_0.publish('Plazas/shelf_temperature/tienda_1',json.dumps(payload),qos=0)
                     
 
 
@@ -230,7 +232,7 @@ def main():
                                 "max":prod["max"]
                             }
 
-                            clientmqtt_2.publish('Plazas/stock/tienda_1',json.dumps(payload),qos=2)
+                            clientmqtt_0.publish('Plazas/stock/tienda_1',json.dumps(payload),qos=0)
                             
                         
 
@@ -250,6 +252,8 @@ def main():
                     if(len(cola_compra_1)!=0):
                         cl_comp=cola_compra_1.pop()
 
+                        #Variable de la cuenta de pago
+                        c=cuenta()
                         #PA CON EL CLIENTE DE CL_COMP
 
 
@@ -296,7 +300,7 @@ def main():
                             "datetime":str(time_s_2)
                         }
 
-                        clientmqtt_0.publish('Plaza/camera/tienda_2',json.dumps(payload),qos=0)
+                        clientmqtt_0.publish('Plazas/camera/tienda_2',json.dumps(payload),qos=0)
 
 
                         people_in_2=people_in_2+1
@@ -326,7 +330,7 @@ def main():
                         "min_temp":x["min_temp"]
                     }
 
-                    clientmqtt_0.publish('Plaza/shelf_temperature/tienda_2',json.dumps(payload),qos=0)
+                    clientmqtt_0.publish('Plazas/shelf_temperature/tienda_2',json.dumps(payload),qos=0)
                     
 
 
@@ -382,7 +386,7 @@ def main():
                                 "max":prod["max"]
                             }
 
-                            clientmqtt_2.publish('Plazas/stock/tienda_2',json.dumps(payload),qos=2)
+                            clientmqtt_0.publish('Plazas/stock/tienda_2',json.dumps(payload),qos=0)
                             
                         
 
@@ -400,6 +404,8 @@ def main():
                     if(len(cola_compra_2)!=0):
                         cl_comp=cola_compra_2.pop()
 
+                        #Variable de la cuenta de pago
+                        c=cuenta()
                         #PA CON EL CLIENTE DE CL_COMP
 
 
@@ -455,7 +461,7 @@ def main():
                         "max":prod["max"]
                     }
 
-                    clientmqtt_2.publish('Plazas/stock/tienda_1',json.dumps(payload),qos=2)
+                    clientmqtt_0.publish('Plazas/stock/tienda_1',json.dumps(payload),qos=0)
                             
                         
 
@@ -473,6 +479,8 @@ def main():
             if(len(cola_compra_1)!=0):
                 cl_comp=cola_busq_1.pop()
 
+                #Variable de la cuenta de pago
+                c=cuenta()
                 #PA CON EL CLIENTE DE CL_COMP
 
 
@@ -517,7 +525,7 @@ def main():
                         "max":prod["max"]
                     }
 
-                    clientmqtt_2.publish('Plazas/stock/tienda_2',json.dumps(payload),qos=2)
+                    clientmqtt_0.publish('Plazas/stock/tienda_2',json.dumps(payload),qos=0)
                             
                         
 
@@ -535,6 +543,8 @@ def main():
             if(len(cola_compra_2!=0)):
                 cl_comp=cola_busq_2.pop()
 
+                #Variable de la cuenta de pago
+                c=cuenta()
                 #PA CON EL CLIENTE DE CL_COMP
 
 
@@ -857,15 +867,28 @@ def get_shelf_temp_2():
 
     
 
-    return lista
-           
+    return lista    
+
+def cuenta():
+    
+    a=random.randint(0,2)
+    cuenta=""
+    if a==0:
+        cuenta="Mercantil"
+    elif a==1:
+        cuenta="Banesco"
+    else:
+        cuenta="Provincial"
+    
+    print(cuenta)
+
+    return cuenta 
 
 #FALTA
-#POSIBLE MANERA DE ASEGURAR QUE SOLO PASE UN DIA
+
 #PA DE COMPRA
 #PA DE DIA
 #PA DE MES
-#CUENTA DE LA COMPRA
 
 
 if __name__ == '__main__':

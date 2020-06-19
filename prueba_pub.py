@@ -122,4 +122,35 @@ def  get_latest_time_1():
 
     return x
 
-get_prod_1()
+def cuenta():
+
+    a=random.randint(0,2)
+    cuenta=""
+    if a==0:
+        cuenta="Mercantil"
+    elif a==1:
+        cuenta="Banesco"
+    else:
+        cuenta="Provincial"
+    
+    print(cuenta)
+
+    return cuenta
+
+host_pub = "broker.hivemq.com"
+
+clientmqtt = mqtt.Client("Publisher_QoS", False)
+clientmqtt.qos = 2
+clientmqtt.connect(host=host_pub)
+
+
+def main():
+
+    payload={
+        "algo":"algo"
+    }
+    clientmqtt.publish('Plazas/restock/'+ str(1) ,json.dumps(payload),qos=0)
+
+
+if __name__ == '__main__':
+       main()
