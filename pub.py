@@ -143,7 +143,7 @@ def main():
                             "datetime":str(time_s_1)
                         }
 
-                        
+                        time.sleep(0.5)
                         clientmqtt_0.publish('Plazas/camera/tienda_1',json.dumps(payload),qos=0)
 
 
@@ -174,7 +174,7 @@ def main():
                         "min_temp":x["min_temp"]
                     }
 
-
+                    time.sleep(0.5)
                     clientmqtt_0.publish('Plazas/shelf_temperature/tienda_1',json.dumps(payload),qos=0)
                     
 
@@ -231,7 +231,7 @@ def main():
                                 "qty_available":new_stock_prod,
                                 "max":prod["max"]
                             }
-
+                            time.sleep(0.5)
                             clientmqtt_0.publish('Plazas/stock/tienda_1',json.dumps(payload),qos=0)
                             
                         
@@ -299,7 +299,7 @@ def main():
                             "store":2,
                             "datetime":str(time_s_2)
                         }
-
+                        time.sleep(0.5)
                         clientmqtt_0.publish('Plazas/camera/tienda_2',json.dumps(payload),qos=0)
 
 
@@ -329,7 +329,7 @@ def main():
                         "temp_actual":x["temp_actual"],
                         "min_temp":x["min_temp"]
                     }
-
+                    time.sleep(0.5)
                     clientmqtt_0.publish('Plazas/shelf_temperature/tienda_2',json.dumps(payload),qos=0)
                     
 
@@ -385,7 +385,7 @@ def main():
                                 "qty_available":new_stock_prod,
                                 "max":prod["max"]
                             }
-
+                            time.sleep(0.5)
                             clientmqtt_0.publish('Plazas/stock/tienda_2',json.dumps(payload),qos=0)
                             
                         
@@ -460,7 +460,7 @@ def main():
                         "qty_available":new_stock_prod,
                         "max":prod["max"]
                     }
-
+                    time.sleep(0.5)
                     clientmqtt_0.publish('Plazas/stock/tienda_1',json.dumps(payload),qos=0)
                             
                         
@@ -524,7 +524,7 @@ def main():
                         "qty_available":new_stock_prod,
                         "max":prod["max"]
                     }
-
+                    time.sleep(0.5)
                     clientmqtt_0.publish('Plazas/stock/tienda_2',json.dumps(payload),qos=0)
                             
                         
