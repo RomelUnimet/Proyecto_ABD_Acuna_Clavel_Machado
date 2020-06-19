@@ -42,7 +42,7 @@ def select(query):
 
 def analyzeCategories():
 
-    query = """ CREATE OR REPLACE VIEW products_cat_selled AS
+    query = """ CREATE OR REPLACE VIEW plaza.products_cat_selled AS
     SELECT DISTINCT p.category, x.store, x.sold FROM 
     (SELECT SUM(bp.quantity) AS sold, bp.id_store AS store, bp.product_name AS product FROM plaza.bill_product AS bp 
     GROUP BY product,store) AS x INNER JOIN plaza.product AS p ON p.name = x.product ORDER BY store;"""
@@ -55,7 +55,7 @@ def analyzeCategories():
     query = """SELECT store, COALESCE(Cereales, 0) AS Cereales, COALESCE(Frutas, 0) AS Frutas, COALESCE(Higiene, 0) AS Higiene
     FROM   crosstab(
     'SELECT store, category, SUM(sold)
-        FROM products_cat_selled 
+        FROM plaza.products_cat_selled 
         GROUP BY 1,2 ORDER BY 1,2;' 
 
     , $$VALUES ('Cereales'::text), ('Frutas'), ('Higiene')$$
@@ -84,7 +84,7 @@ def analyzeCategories():
 
 # METODO PARA CREAR EL PA
 def client_preferences(argument):
-    query=""" CREATE OR REPLACE FUNCTION client_preferences ()
+    query=""" CREATE OR REPLACE FUNCTION plaza.client_preferences ()
     RETURNS TABLE (client varchar(50), bank_of_preference varchar(15), category_of_preference varchar(20), store_of_preference integer) 
     AS $$ 
     DECLARE 
@@ -140,35 +140,35 @@ def client_preferences(argument):
 
 def one(): # 1.- Obtener qué banco, categoría de producto, y tienda prefieren nuestros clientes afiliados.
 
-    query= """	 WITH bank AS (SELECT bank_of_preference, COUNT(bank_of_preference) cuenta FROM client_preferences() 
+    query= """	 WITH bank AS (SELECT bank_of_preference, COUNT(bank_of_preference) cuenta FROM plaza.client_preferences() 
 	 GROUP BY bank_of_preference ORDER BY cuenta DESC LIMIT 1),
 
-	 cat AS (SELECT category_of_preference, COUNT(category_of_preference) cuenta FROM client_preferences() 
+	 cat AS (SELECT category_of_preference, COUNT(category_of_preference) cuenta FROM plaza.client_preferences() 
 	 GROUP BY category_of_preference ORDER BY cuenta DESC LIMIT 1),
 	 
-	 store AS(SELECT store_of_preference, COUNT(store_of_preference) cuenta FROM client_preferences() 
+	 store AS(SELECT store_of_preference, COUNT(store_of_preference) cuenta FROM plaza.client_preferences() 
 	 GROUP BY store_of_preference ORDER BY cuenta DESC LIMIT 1)
 
 	 SELECT bank.bank_of_preference, cat.category_of_preference, store.store_of_preference FROM bank, cat, store"""
     return print(select(query))
 
 def two(): # 2.- Obtener el banco que prefieren nuestros afiliados junto con la cantidad de clientes cuya preferencia es ese banco.
-    query="""SELECT bank_of_preference, COUNT(bank_of_preference) AS nr_clients FROM client_preferences() 
+    query="""SELECT bank_of_preference, COUNT(bank_of_preference) AS nr_clients FROM plaza.client_preferences() 
     GROUP BY bank_of_preference ORDER BY nr_clients DESC LIMIT 1;"""
     return print(select(query))
 
 def three():# 3.- Obtener la categoría que prefieren nuestros afiliados junto con la cantidad de clientes cuya preferencia es esa categoría.
-    query="""SELECT category_of_preference, COUNT(category_of_preference) AS nr_clients FROM client_preferences() 
+    query="""SELECT category_of_preference, COUNT(category_of_preference) AS nr_clients FROM plaza.client_preferences() 
     GROUP BY category_of_preference ORDER BY nr_clients DESC LIMIT 1;"""
     return print(select(query))
 
 def four(): # 4.- Obtener la tienda que prefieren nuestros afiliados junto con la cantidad de clientes cuya preferencia es esa tienda.
-    query="""SELECT store_of_preference, COUNT(store_of_preference) AS nr_clients FROM client_preferences() 
+    query="""SELECT store_of_preference, COUNT(store_of_preference) AS nr_clients FROM plaza.client_preferences() 
     GROUP BY store_of_preference ORDER BY nr_clients DESC LIMIT 1;"""
     return print(select(query))
 
 def five(): #5.- Obtener las preferencias individuales de cada uno de nuestros clientes afiliados.
-    query=""" SELECT * FROM client_preferences();"""
+    query=""" SELECT * FROM plaza.client_preferences();"""
     return print(select(query))
 
 def outOfBounds():
