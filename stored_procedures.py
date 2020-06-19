@@ -67,14 +67,14 @@ def buyProcedure(product, bank, ci_client, date_transaction, store):
     conn.commit() 
 
 #mock client
-client = '{"client": "Victoria", "list":[{"prod": "Pera", "qty":10}, {"prod": "Manzana", "qty":69}]}'
+# client = '{"client": "Victoria", "list":[{"prod": "Pera", "qty":10}, {"prod": "Manzana", "qty":69}]}'
 
-data = json.loads(client)
-car = []
-for i in data['list']:
-    car.append((i['prod'], i['qty']))
+# data = json.loads(client)
+# car = []
+# for i in data['list']:
+#     car.append((i['prod'], i['qty']))
 
-buyProcedure(car, 'Provincial', 'e27111000', '2020-06-15', 1)
+# buyProcedure(car, 'Provincial', 'e27111000', '2020-06-15', 1)
 
 
 #Procedimiento 2:
