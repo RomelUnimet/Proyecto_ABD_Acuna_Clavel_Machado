@@ -188,4 +188,4 @@ def update_prices(d):
     conn.commit() 
 
 # UNCOMMENT THE LINE BELOW TO RUN THE FUNCTION.
-update_prices('2020-06-23 08:08:08.08')
+# update_prices('2020-06-23 08:08:08.08')
