@@ -96,8 +96,7 @@ def main():
 
     while(True):
 
-        #UPDATE DE LOS PRECIOS DEL DIA
-        sp.update_prices()
+    
         print("INICIO DEL DIA")
 
         #reiniciar array clientes
