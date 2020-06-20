@@ -33,16 +33,16 @@ conn = psycopg2.connect(
 #            (15, 'Los Naranjos', '9:00:00', '20:00:00')
 # ;"""
 
-query="""
-    INSERT INTO plaza.product (name, id_store, category)
-    VALUES ('Helado de fresa', 1, 'Congelados'),
-           ('Helado de fresa', 2, 'Congelados'),
-           ('Tequeños', 1, 'Congelados'),
-           ('Tequeños', 2, 'Congelados'),
-           ('Helado de chocolate', 1, 'Congelados'),
-           ('Helado de chocolate', 2, 'Congelados')
+# query="""
+#     INSERT INTO plaza.product (name, id_store, category)
+#     VALUES ('Helado de fresa', 1, 'Congelados'),
+#            ('Helado de fresa', 2, 'Congelados'),
+#            ('Tequeños', 1, 'Congelados'),
+#            ('Tequeños', 2, 'Congelados'),
+#            ('Helado de chocolate', 1, 'Congelados'),
+#            ('Helado de chocolate', 2, 'Congelados')
 
-;"""
+# ;"""
 
 # query="""
 #     INSERT INTO plaza.price (product_name, id_store, price, cost, date)
@@ -52,7 +52,11 @@ query="""
 
 # query="""
 #     INSERT INTO plaza.bill (client_ci, id_store, account, datetime, total)
-#     VALUES  ('v27000000', 1, 'Provincial', '2020-06-12 10:30.396128', 0)
+#     VALUES  ('e27111000', 1, 'Provincial', '2020-06-17 10:30.396128', 0),
+#             ('v27000222', 1, 'Mercantil', '2020-06-18 10:30.396128', 0),
+#             ('e27000111', 2, 'Banesco', '2020-06-18 10:30.396128', 0),
+#             ('v27000000', 2, 'Mercantil', '2020-06-18 11:30.396128', 0)
+
             
 
 # ;"""
@@ -60,7 +64,10 @@ query="""
 
 # query="""
 #     INSERT INTO plaza.visit (client_ci, id_store, datetime)
-#     VALUES ('e27000111', 1, '2020-06-17 9:30.396128')
+#     VALUES ('e27111000', 1, '2020-06-17 9:30.396128'),
+#            ('v27000222', 1, '2020-06-18 9:30.396128'),
+#            ('e27000111', 2, '2020-06-18 9:30.396128'),
+#            ('v27000000', 2, '2020-06-18 11:30.396128')
 # ;"""
 
 # query="""
@@ -123,7 +130,10 @@ def select(query):
         return records
 # Close the connection
 # conn.close()
-query="SELECT * FROM plaza.shelf"
+query="""
+    SELECT MAX(date) FROM plaza.price
+    WHERE product_name='Manzana' AND id_store='2'
+"""
 print(select(query))
 # cur = conn.cursor()
 # cur.execute(query)
