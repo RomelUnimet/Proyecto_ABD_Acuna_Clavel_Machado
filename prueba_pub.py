@@ -147,12 +147,19 @@ clientmqtt.connect(host=host_pub)
 def main():
 
     payload={
-        "algo":"algo"
+        "shelf_id":7,
+        "id_store":1,
+        "datetime":str(datetime.datetime.now()),
+        "temp_actual":-14,
+        "min_temp":-19
     }
-    for x in range(2):
-        print('-------------------------------------------------------------------------')
-        time.sleep(0.5)
-        clientmqtt.publish('Plazas/stock/'+ str(1) ,json.dumps(payload),qos=0)
+    #for x in range(2):
+        #print('-------------------------------------------------------------------------')
+    time.sleep(0.5)
+
+    clientmqtt.publish('Plazas/shelf_temperature/'+str(1) ,json.dumps(payload),qos=0)     
+    #x=abs(payload["min_temp"]-payload["temp_actual"])
+    #print(x)
 
 
 if __name__ == '__main__':
