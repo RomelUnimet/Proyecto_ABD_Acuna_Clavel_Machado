@@ -9,6 +9,7 @@ import numpy as np
 import datetime
 import psycopg2 as psy
 import pandas as pd
+import stored_procedures as sp 
 
 
 host='drona.db.elephantsql.com'
@@ -95,6 +96,7 @@ def main():
 
     while(True):
 
+    
         print("INICIO DEL DIA")
 
         #reiniciar array clientes
@@ -105,6 +107,9 @@ def main():
         time_s_2=time_s_2.replace(hour=time_open_2,minute=0)
         print(time_s_1)
         print(time_s_2)
+
+        #UPDATE DE LOS PRECIOS DEL DIA
+        sp.update_prices(time_s_1)
 
         #loop con la duracion del dia
         while(time_s_1.hour<time_close_1 and time_s_2.hour<time_close_2 and len(clients)!=0): #si no hay clientes disponibles se acaba el dia sabrosamente 
@@ -253,8 +258,12 @@ def main():
                         cl_comp=cola_compra_1.pop()
 
                         #Variable de la cuenta de pago
-                        c=cuenta()
-                        #PA CON EL CLIENTE DE CL_COMP
+                        cl_cuenta=cuenta()
+
+                        cl_cart=new_cart(cl_comp)
+
+                        sp.buyProcedure(cl_cart,cl_cuenta,cl_comp['client'],time_s_1,1)
+
 
 
                         people_in_1=people_in_1-1
@@ -405,8 +414,11 @@ def main():
                         cl_comp=cola_compra_2.pop()
 
                         #Variable de la cuenta de pago
-                        c=cuenta()
-                        #PA CON EL CLIENTE DE CL_COMP
+                        cl_cuenta=cuenta()
+
+                        cl_cart=new_cart(cl_comp)
+
+                        sp.buyProcedure(cl_cart,cl_cuenta,cl_comp['client'],time_s_2,2)
 
 
                         people_in_2=people_in_2-1
@@ -479,10 +491,13 @@ def main():
             if(len(cola_compra_1)!=0):
                 cl_comp=cola_busq_1.pop()
 
+                
                 #Variable de la cuenta de pago
-                c=cuenta()
-                #PA CON EL CLIENTE DE CL_COMP
+                cl_cuenta=cuenta()
 
+                cl_cart=new_cart(cl_comp)
+
+                sp.buyProcedure(cl_cart,cl_cuenta,cl_comp['client'],time_s_1,1)
 
                 people_in_1=people_in_1-1
                 time_s_1=time_s_1+datetime.timedelta(minutes=1)
@@ -544,8 +559,11 @@ def main():
                 cl_comp=cola_busq_2.pop()
 
                 #Variable de la cuenta de pago
-                c=cuenta()
-                #PA CON EL CLIENTE DE CL_COMP
+                cl_cuenta=cuenta()
+
+                cl_cart=new_cart(cl_comp)
+
+                sp.buyProcedure(cl_cart,cl_cuenta,cl_comp['client'],time_s_1,1)
 
 
                 people_in_2=people_in_2-1
@@ -568,6 +586,8 @@ def main():
 
         #CREO QUE ES AQUI  NO ESOTY SEGURO
         #PA FIN DEL DIA
+        sp.account_state(time_s_1)
+
 
 
         #VAR PARA VER SI PASO AL SIG MES
@@ -575,9 +595,9 @@ def main():
         dia_desp_2=time_s_2+datetime.timedelta(days=1)
 
         if(time_s_1.month!=dia_desp_1.month): #es un mes se hace el PA del mes
-            pa_del_mes=0
+            sp.clients_points_state(time_s_1)
         if(time_s_2.month!=dia_desp_2.month): #es un mes se hace el PA del mes
-            pa_del_mes=0
+            sp.clients_points_state(time_s_2)
 
         
         #PODRIA HACER LO QUE ASEGURA QUE NO SE PASE EL DIA
@@ -884,11 +904,18 @@ def cuenta():
 
     return cuenta 
 
+def new_cart(client:any):
+
+    car=[]
+    for i in client['list']:
+        car.append((i['prod'],i['quantity']))
+    print(car)
+    return car
+
 #FALTA
 
 #PA DE COMPRA
 #PA DE DIA
-#PA DE MES
 
 
 if __name__ == '__main__':
