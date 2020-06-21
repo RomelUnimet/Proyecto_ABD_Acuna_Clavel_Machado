@@ -97,51 +97,8 @@ def createTriggerAddPointsWhenPurchase():
     cur.close()
     conn.commit()
 
-# def createTriggerAddPointsWhenPurchase():
 
-#     query = """
-#     CREATE OR REPLACE FUNCTION plaza.addPointsWhenPurchase()
-#     RETURNS trigger AS $$
-#     DECLARE 
-#         date_ date := (SELECT datetime FROM plaza.bill WHERE NEW.bill_id=_id)::date;
-#         price numeric := (SELECT price FROM plaza.price
-#                           WHERE product_name = NEW.product_name AND
-#                           date = date_ AND
-#                           NEW.id_store = id_store
-#                          );
-#     BEGIN 
-#         IF NEW.bill_id IN (SELECT _id FROM plaza.bill, plaza.membership
-#                            WHERE plaza.bill.client_ci = plaza.membership.ci
-#                            )
-#         THEN
-#             UPDATE plaza.membership
-#             SET points = CAST( (points+((price*NEW.quantity)*0.1))  AS INT)
-#             WHERE ci IN (SELECT client_ci FROM plaza.bill, plaza.membership
-#                         WHERE plaza.bill.client_ci = plaza.membership.ci
-#                         );
-#         END IF;
-#         RETURN NEW;
-#     END;
-#     $$ LANGUAGE plpgsql;
-#     ;"""
-
-#     cur = conn.cursor()
-#     cur.execute(query)
-#     cur.close()
-#     conn.commit()
-
-#     query = """
-#     CREATE TRIGGER addPointsWhenPurchase
-#     AFTER INSERT ON plaza.bill_product
-#         FOR EACH ROW 
-#             EXECUTE PROCEDURE plaza.addPointsWhenPurchase()       
-#     ;"""
-#     cur = conn.cursor()
-#     cur.execute(query)
-#     cur.close()
-#     conn.commit()
-
-createTriggerAddPointsWhenPurchase()
+# createTriggerAddPointsWhenPurchase()
 
 
 # THIRD TRIGGER
@@ -231,42 +188,6 @@ def createTriggerUpdateTotal():
     cur.close()
     conn.commit()
 
-# def createTriggerUpdateTotal():
-
-#     query = """
-#     CREATE OR REPLACE FUNCTION plaza.updateTotal()
-#     RETURNS trigger AS $$
-#     DECLARE 
-#         date_ date := (SELECT datetime FROM plaza.bill WHERE NEW.bill_id=_id)::date;
-#         price numeric := (SELECT price FROM plaza.price
-#                           WHERE product_name = NEW.product_name AND
-#                           date = date_ AND
-#                           NEW.id_store = id_store
-#                          );
-#     BEGIN 
-#         UPDATE plaza.bill
-#         SET total = (total+(price*NEW.quantity))
-#         WHERE NEW.bill_id = _id;
-#         RETURN NEW;
-#     END;
-#     $$ LANGUAGE plpgsql;
-#     ;"""
-
-#     cur = conn.cursor()
-#     cur.execute(query)
-#     cur.close()
-#     conn.commit()
-
-#     query = """
-#     CREATE TRIGGER updateTotal
-#     AFTER INSERT ON plaza.bill_product
-#         FOR EACH ROW 
-#             EXECUTE PROCEDURE plaza.updateTotal()       
-#     ;"""
-#     cur = conn.cursor()
-#     cur.execute(query)
-#     cur.close()
-#     conn.commit()
 
 # createTriggerUpdateTotal()
 
