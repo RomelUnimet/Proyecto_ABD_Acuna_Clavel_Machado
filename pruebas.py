@@ -8,17 +8,32 @@ conn = psycopg2.connect(
     database='ftuzkdcj'
 )
 
-# query="""
-#     INSERT INTO plaza.client (ci, name, last_name)
-#     VALUES ('v27000000', 'Victoria', 'Acuna'),
-#            ('v27000111', 'Wilfredo', 'Machado'),
-#            ('e27111000', 'Romel', 'Clavel'),
-#            ('e27222000', 'Paola', 'Sollecito'),
-#            ('v27000222', 'Gianluca', 'Di Bella'),
-#            ('e27000000', 'Valeria', 'Trotta'),
-#            ('e27000111', 'Valeska', 'Silva')
+query="""
+    INSERT INTO plaza.client (ci, name, last_name)
+    VALUES ('v25000000', 'Nicol', 'Leal'),
+           ('v25000111', 'Massimo', 'Tassinari'),
+           ('e25111000', 'Leonardo', 'González'),
+           ('e25222000', 'Patricia', 'Borrero'),
+           ('v25000222', 'Leonardo', 'Jiménez'),
+           ('e25000000', 'Diego', 'Fernandes'),
+           ('e25000112', 'Gianmarco', 'De Pacificis'),
+           ('v26000000', 'Nicole', 'Brito'),
+           ('v26000111', 'Giselle', 'Ferreira'),
+           ('e26111000', 'Erika', 'Jiménez'),
+           ('e26222000', 'Sofía', 'Machado'),
+           ('v26000222', 'Fabiana', 'Acuña'),
+           ('e26000000', 'Graciela', 'Ramírez'),
+           ('e28000111', 'Francesco', 'Donnarumma'),
+           ('v28000000', 'Carlos', 'Piñerua'),
+           ('v28000111', 'Carlota', 'González'),
+           ('e28111000', 'Mercedes', 'Grau'),
+           ('e28222000', 'Sofía', 'González'),
+           ('v28000222', 'Sara', 'Garroni'),
+           ('e28000000', 'Félix', 'Marin'),
+           ('e29000111', 'Vanessa', 'Marin')
 
-# ;"""
+
+;"""
 
 # query="""
 #     INSERT INTO plaza.membership (ci, points)
@@ -34,19 +49,28 @@ conn = psycopg2.connect(
 # ;"""
 
 # query="""
-#     INSERT INTO plaza.product (name, id_store, category)
-#     VALUES ('Helado de fresa', 1, 'Congelados'),
-#            ('Helado de fresa', 2, 'Congelados'),
-#            ('Tequeños', 1, 'Congelados'),
-#            ('Tequeños', 2, 'Congelados'),
-#            ('Helado de chocolate', 1, 'Congelados'),
-#            ('Helado de chocolate', 2, 'Congelados')
-
+#     INSERT INTO plaza.shelf (id_store, capacity, product_name, min_temperature)
+#     VALUES (1, 50, 'Pulpa de fresa', -19),
+#            (2, 50, 'Pulpa de mora', -19),
+#            (1, 70, 'Yuca', -19),
+#            (2, 50, 'Yuca', -19),
+#            (1, 100, 'Hielo', -19),
+#            (2, 100, 'Hielo', -19),
+#            (1, 70, 'Masa lista', -19),
+#            (2, 50, 'Masa lista', -19),
+#            (1, 40, 'Pescado', -18),
+#            (2, 50, 'Pescado', -18)
+           
 # ;"""
+
+
 
 # query="""
 #     INSERT INTO plaza.price (product_name, id_store, price, cost, date)
-#     VALUES ('Manzana', 1, 280, 100, '2020-06-12')
+#     VALUES 
+#            ('Arvejas', 1, 200, 100, '2020-06-18'),
+#            ('Mayonesa', 2, 230, 100, '2020-06-18'),
+#            ('Pan Bimbo', 2, 250, 100, '2020-06-18')
 
 #  ;"""
 
@@ -73,7 +97,9 @@ conn = psycopg2.connect(
 # query="""
 #     INSERT INTO plaza.bill_product (bill_id, product_name, quantity, id_store)
 #     VALUES 
-#            (15, 'Manzana', 2, 1)
+#            (34, 'Arvejas', 2, 1),
+#            (35, 'Mayonesa', 7, 2),
+#            (36, 'Pan Bimbo', 2, 2)
 # ;"""
 
 # query="""
@@ -117,6 +143,7 @@ conn = psycopg2.connect(
            
 # ;"""
 
+
 def select(query):
     cur = conn.cursor()
     try:
@@ -130,12 +157,12 @@ def select(query):
         return records
 # Close the connection
 # conn.close()
-query="""
-    SELECT MAX(date) FROM plaza.price
-    WHERE product_name='Manzana' AND id_store='2'
-"""
-print(select(query))
-# cur = conn.cursor()
-# cur.execute(query)
-# cur.close()
-# conn.commit()
+# query="""
+#     SELECT _id FROM plaza.bill, plaza.membership
+#                            WHERE plaza.bill.client_ci = plaza.membership.ci
+# """
+# print(select(query))
+cur = conn.cursor()
+cur.execute(query)
+cur.close()
+conn.commit()

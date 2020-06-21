@@ -63,6 +63,10 @@ def createTriggerAddPointsWhenPurchase():
                           date = date_ AND
                           NEW.id_store = id_store
                          );
+        ci_ character varying := (
+                                    SELECT client_ci FROM plaza.bill
+                                    WHERE _id = NEW.bill_id
+                                  );
     BEGIN 
         IF NEW.bill_id IN (SELECT _id FROM plaza.bill, plaza.membership
                            WHERE plaza.bill.client_ci = plaza.membership.ci
@@ -70,9 +74,7 @@ def createTriggerAddPointsWhenPurchase():
         THEN
             UPDATE plaza.membership
             SET points = CAST( (points+((price*NEW.quantity)*0.1))  AS INT)
-            WHERE ci IN (SELECT client_ci FROM plaza.bill, plaza.membership
-                        WHERE plaza.bill.client_ci = plaza.membership.ci
-                        );
+            WHERE ci = ci_;
         END IF;
         RETURN NEW;
     END;
@@ -139,7 +141,7 @@ def createTriggerAddPointsWhenPurchase():
 #     cur.close()
 #     conn.commit()
 
-# createTriggerAddPointsWhenPurchase()
+createTriggerAddPointsWhenPurchase()
 
 
 # THIRD TRIGGER
@@ -266,7 +268,7 @@ def createTriggerUpdateTotal():
 #     cur.close()
 #     conn.commit()
 
-createTriggerUpdateTotal()
+# createTriggerUpdateTotal()
 
 
 
