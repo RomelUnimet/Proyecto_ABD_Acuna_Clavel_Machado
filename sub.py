@@ -42,7 +42,7 @@ def on_message_camera(client, userdata, message):
 
     cur = conn.cursor()                             
     cur.execute("INSERT INTO plaza.visit (client_ci, id_store, datetime) VALUES (%s, %s, %s);",
-                (a["ci"],a["id_store"],a["datetime"]))
+                (a["ci"],a["store"],a["datetime"]))
     conn.commit()
 
     #INSERTAMOS LA VISITA DEL CLIENTE
