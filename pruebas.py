@@ -48,20 +48,22 @@ query="""
 #            (15, 'Los Naranjos', '9:00:00', '20:00:00')
 # ;"""
 
-# query="""
-#     INSERT INTO plaza.shelf (id_store, capacity, product_name, min_temperature)
-#     VALUES (1, 50, 'Pulpa de fresa', -19),
-#            (2, 50, 'Pulpa de mora', -19),
-#            (1, 70, 'Yuca', -19),
-#            (2, 50, 'Yuca', -19),
-#            (1, 100, 'Hielo', -19),
-#            (2, 100, 'Hielo', -19),
-#            (1, 70, 'Masa lista', -19),
-#            (2, 50, 'Masa lista', -19),
-#            (1, 40, 'Pescado', -18),
-#            (2, 50, 'Pescado', -18)
+query="""
+    INSERT INTO plaza.in_stock (id_store, qty_available, shelf_id, datetime)
+    VALUES (1, 50, 64, '2020-06-18 10:30.396128'),
+           (1, 50, 65, '2020-06-18 10:30.396128'),
+           (2, 50, 66, '2020-06-18 10:30.396128'),
+           (1, 100, 67, '2020-06-18 10:30.396128'),
+           (2, 150, 68, '2020-06-18 10:30.396128'),
+           (1, 200, 69, '2020-06-18 10:30.396128'),
+           (1, 200, 70, '2020-06-18 10:30.396128'),
+           (2, 150, 71, '2020-06-18 10:30.396128'),
+           (1, 100, 72, '2020-06-18 10:30.396128'),
+           (2, 200, 73, '2020-06-18 10:30.396128'),
+           (1, 70, 74, '2020-06-18 10:30.396128'),
+           (2, 80, 75, '2020-06-18 11:30.396128')
            
-# ;"""
+;"""
 
 
 
@@ -112,10 +114,10 @@ query="""
 #     WHERE client_ci='v27654321'
 # ;"""
 
-# query="""
-#     DELETE FROM plaza.bill_product
-#     WHERE bill_id=8
-# ;"""
+query="""
+    DELETE FROM plaza.price
+    WHERE date='2020'
+;"""
 
 # query="""
 #     DROP TABLE plaza.bill_product, plaza.temperature, plaza.in_stock, plaza.restock, plaza.visit,
