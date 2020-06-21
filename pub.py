@@ -74,6 +74,8 @@ def main():
     #funciones que traigan los tiempos
     hours1=get_open_close_1()
     hours2=get_open_close_2()
+    limite_tiempo=60 #sacar despues cual seria buena en MINUTOS FIJO
+    sum_time=10
     
     time_open_1=hours1["opening"]
     time_open_2=hours2["opening"]
@@ -217,7 +219,7 @@ def main():
 
 
                 #CICLO DE BUSQUEDA Y COMPRA
-                limite_tiempo=60 #sacar despues cual seria buena en MINUTOS FIJO
+                
                 tiempo_trans=0 #tiempo que transcurre en MINUTOS/ EMPIEZA EN 0 #tiene que trancurrir el tiempo
 
 
@@ -251,8 +253,8 @@ def main():
 
 
                             prod_list.append(n)
-                            tiempo_trans=tiempo_trans + 3 #"1 minuto por cada producto o algo asi" 
-                            time_s_1=time_s_1+datetime.timedelta(minutes=1)
+                            tiempo_trans=tiempo_trans + sum_time #"1 minuto por cada producto o algo asi" 
+                            time_s_1=time_s_1+datetime.timedelta(minutes=sum_time)
                             
 
                             new_stock_prod=max_cant_prod-quantity
@@ -300,7 +302,7 @@ def main():
                         people_in_1=people_in_1-1
                         print('----------------------------------------------------------------------------------')
                        
-                        minutes_buy=len(cl_comp["list"])*3
+                        minutes_buy=len(cl_comp["list"])*sum_time
                         tiempo_trans=tiempo_trans + minutes_buy #"1 minuto por cada producto o algo asi" 
                         time_s_1=time_s_1+datetime.timedelta(minutes=len(cl_comp["list"]))
 
@@ -380,7 +382,7 @@ def main():
 
 
                 #CICLO DE BUSQUEDA Y COMPRA
-                limite_tiempo=60 #sacar despues cual seria buena en MINUTOS FIJO
+               
                 tiempo_trans=0 #tiempo que transcurre en MINUTOS/ EMPIEZA EN 0 #tiene que trancurrir el tiempo
 
 
@@ -414,8 +416,8 @@ def main():
 
 
                             prod_list.append(n)
-                            tiempo_trans=tiempo_trans + 3 #"1 minuto por cada producto o algo asi" 
-                            time_s_2=time_s_2+datetime.timedelta(minutes=1)
+                            tiempo_trans=tiempo_trans + sum_time #"1 minuto por cada producto o algo asi" 
+                            time_s_2=time_s_2+datetime.timedelta(minutes=sum_time)
                             
 
                             new_stock_prod=max_cant_prod-quantity
@@ -458,7 +460,7 @@ def main():
 
 
                         people_in_2=people_in_2-1
-                        minutes_buy=len(cl_comp["list"])*3
+                        minutes_buy=len(cl_comp["list"])*sum_time
                         tiempo_trans=tiempo_trans +minutes_buy  #"1 minuto por cada producto o algo asi" 
                         
                         time_s_2=time_s_2+datetime.timedelta(minutes=minutes_buy)
