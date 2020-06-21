@@ -156,3 +156,36 @@ def clients_points_state(last_date_month):
     print(select(query))
 # UNCOMMENT THE LINE BELOW TO RUN THE FUNCTION.
 #clients_points_state('2020-06-04')
+
+
+def update_prices(d):
+
+    query = """ CREATE OR REPLACE FUNCTION plaza.update_prices (d timestamp)
+    RETURNS void 
+    AS $$ 
+    DECLARE 
+        X RECORD;
+    BEGIN
+	
+		FOR X IN (SELECT date AS fe, id_store, product_name, price, cost FROM plaza.price as pBig WHERE date = 
+				 (SELECT MAX(date) FROM plaza.price AS pS WHERE pBig.product_name = pS.product_name AND pBig.id_store = pS.id_store)
+				 GROUP BY product_name, id_store, price, date) LOOP
+					INSERT INTO plaza.price VALUES (DATE(d), X.id_store, X.product_name, X.price*1.05, X.cost*1.05);
+				 END LOOP;
+    END;
+    $$ 
+    LANGUAGE plpgsql; """
+
+    cur = conn.cursor()
+    cur.execute(query)
+    cur.close()
+    conn.commit()
+
+    query = f""" SELECT plaza.update_prices('{d}')"""
+    cur = conn.cursor()
+    cur.execute(query)
+    cur.close()
+    conn.commit() 
+
+# UNCOMMENT THE LINE BELOW TO RUN THE FUNCTION.
+# update_prices('2020-06-23 08:08:08.08')

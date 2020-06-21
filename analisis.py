@@ -53,18 +53,23 @@ def analyzeCategories():
     conn.commit()
 
     query = """SELECT store, COALESCE(Cereales, 0) AS Cereales, COALESCE(Frutas, 0) AS Frutas, COALESCE(Higiene, 0) AS Higiene
+    , COALESCE(Congelados, 0) AS Congelados, COALESCE(Snacks, 0) AS Snacks, COALESCE(Panes, 0) AS Panes
+    , COALESCE(Granos, 0) AS Granos, COALESCE(Salsas, 0) AS Salsas, COALESCE(Proteinas, 0) AS Proteinas 
+    , COALESCE(Vegetales,0) AS Vegetales, COALESCE(Hortalizas,0) AS Hortalizas
     FROM   crosstab(
     'SELECT store, category, SUM(sold)
         FROM plaza.products_cat_selled 
         GROUP BY 1,2 ORDER BY 1,2;' 
 
-    , $$VALUES ('Cereales'::text), ('Frutas'), ('Higiene')$$
-    ) AS ct (store text, Cereales int, Frutas int, Higiene int);"""
+    , $$VALUES ('Cereales'::text), ('Frutas'), ('Higiene'), ('Congelados'),
+     ('Snacks'), ('Panes'), ('Granos'), ('Salsas'), ('Proteinas'), ('Vegetales'), ('Hortalizas')$$
+    ) AS ct (store text, Cereales int, Frutas int, Higiene int, Congelados int, Snacks int, Panes int, Granos int, 
+    Salsas int, Proteinas int, Vegetales int, Hortalizas int);"""
 
     print(select(query))
 
 # UNCOMMENT THE LINE BELOW TO RUN THE FUNCTION.
-# analyzeCategories()
+analyzeCategories()
 
 
 # SECOND QUESTION.
@@ -285,4 +290,4 @@ def yesterdayInStock(id_store, shelf_id):
 # En este caso, especificó cuál fue el comportamiento de la disponibilidad por hora en el estante 3 de la tienda 1.
 
 # UNCOMMENT THE LINE BELOW TO RUN THE FUNCTION.
-yesterdayInStock(1,3)
+# yesterdayInStock(1,3)
