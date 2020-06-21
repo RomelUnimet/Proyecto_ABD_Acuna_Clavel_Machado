@@ -1,7 +1,7 @@
 // TOTY
-//  {
-//      "python.pythonPath": "C:\\Users\\romel\\AppData\\Local\\Programs\\Python\\Python38\\python.exe"
-//  }
+  // {
+  //     "python.pythonPath": "C:\\Users\\romel\\AppData\\Local\\Programs\\Python\\Python38\\python.exe"
+  // }
 
 // VICS
 {
@@ -9,6 +9,6 @@
 }
 
 // WIL
-// {
-//    "python.pythonPath": "C:\\Users\\wilfr\\anaconda3\\python.exe"
-// }
+//{
+//   "python.pythonPath": "C:\\Users\\wilfr\\anaconda3\\python.exe"
+//}

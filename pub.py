@@ -46,6 +46,9 @@ def main():
     #PONER UN IF PARA QUE COMIENCEN EL MISMO DIA AJURO
     time_s_1=datetime.datetime.now().replace(year=int(time1["year"]),month=int(time1["month"]),day=int(time1["day"]))
     time_s_2=datetime.datetime.now().replace(year=int(time2["year"]),month=int(time2["month"]),day=int(time2["day"]))
+    time_s_1=time_s_1+datetime.timedelta(days=1)
+    time_s_2=time_s_2+datetime.timedelta(days=1)
+    
 
     
 
@@ -71,6 +74,8 @@ def main():
     #funciones que traigan los tiempos
     hours1=get_open_close_1()
     hours2=get_open_close_2()
+    limite_tiempo=60 #sacar despues cual seria buena en MINUTOS FIJO
+    sum_time=10
     
     time_open_1=hours1["opening"]
     time_open_2=hours2["opening"]
@@ -96,8 +101,34 @@ def main():
 
     while(True):
 
-    
+        print("----------------------------------------------------------------------------")
+        print("----------------------------------------------------------------------------")
+        print("----------------------------------------------------------------------------")
+        print("----------------------------------------------------------------------------")
+        print("----------------------------------------------------------------------------")
+        print("----------------------------------------------------------------------------")
+        print("----------------------------------------------------------------------------")
+        print("----------------------------------------------------------------------------")
+        print("----------------------------------------------------------------------------")
+        print("----------------------------------------------------------------------------")
+        print("----------------------------------------------------------------------------")
+        print("----------------------------------------------------------------------------")
+        print("----------------------------------------------------------------------------")
         print("INICIO DEL DIA")
+    
+        print("----------------------------------------------------------------------------")
+        print("----------------------------------------------------------------------------")
+        print("----------------------------------------------------------------------------")
+        print("----------------------------------------------------------------------------")
+        print("----------------------------------------------------------------------------")
+        print("----------------------------------------------------------------------------")
+        print("----------------------------------------------------------------------------")
+        print("----------------------------------------------------------------------------")
+        print("----------------------------------------------------------------------------")
+        print("----------------------------------------------------------------------------")
+        print("----------------------------------------------------------------------------")
+        print("----------------------------------------------------------------------------")
+        print("----------------------------------------------------------------------------")
 
         #reiniciar array clientes
         clients=get_clients()
@@ -119,11 +150,13 @@ def main():
 
             #if de la tienda 1
             if(time_s_1.hour<time_close_1): 
-                print('entro')
                 #simulacion entrada random de clientes
 
                 #generamos la cantidad
-                cant=random.randint(1,3) #np.random.normal(media,dist) no puede ser neg
+                if(len(clients)>=3):
+                    cant=random.randint(1,3) #np.random.normal(media,dist) no puede ser neg
+                else:
+                    cant=len(clients)
 
                 client_select=[]
                 #sacamos de manera random del array de clientes
@@ -153,7 +186,7 @@ def main():
 
 
                         people_in_1=people_in_1+1
-                        print("people in store 1" + str(people_in_1) )
+                        print("people in store 1: " + str(people_in_1) )
                     else:
                         cola_espera_1.append(x)
                         print(x+" entro a la cola de espera")
@@ -186,7 +219,7 @@ def main():
 
 
                 #CICLO DE BUSQUEDA Y COMPRA
-                limite_tiempo=15 #sacar despues cual seria buena en MINUTOS FIJO
+                
                 tiempo_trans=0 #tiempo que transcurre en MINUTOS/ EMPIEZA EN 0 #tiene que trancurrir el tiempo
 
 
@@ -209,8 +242,8 @@ def main():
                             prod=store_prod_1.pop()
 
                             max_cant_prod=prod["stock"]
-                            quantity=random.randint(1,max_cant_prod) #np.random.normal(media,dist) no puede ser 0 y tiene que ser menos que el stock maximo que se tiene
-
+                            rnd=int((prod["stock"]/2)+1)
+                            quantity=random.randint(1,rnd) 
 
 
                             n={
@@ -220,8 +253,8 @@ def main():
 
 
                             prod_list.append(n)
-                            tiempo_trans=tiempo_trans + 1 #"1 minuto por cada producto o algo asi" 
-                            time_s_1=time_s_1+datetime.timedelta(minutes=1)
+                            tiempo_trans=tiempo_trans + sum_time #"1 minuto por cada producto o algo asi" 
+                            time_s_1=time_s_1+datetime.timedelta(minutes=sum_time)
                             
 
                             new_stock_prod=max_cant_prod-quantity
@@ -269,12 +302,13 @@ def main():
                         people_in_1=people_in_1-1
                         print('----------------------------------------------------------------------------------')
                        
-                        tiempo_trans=tiempo_trans + len(cl_comp["list"]) #"1 minuto por cada producto o algo asi" 
+                        minutes_buy=len(cl_comp["list"])*sum_time
+                        tiempo_trans=tiempo_trans + minutes_buy #"1 minuto por cada producto o algo asi" 
                         time_s_1=time_s_1+datetime.timedelta(minutes=len(cl_comp["list"]))
 
                         if (len(cola_espera_1)!=0):
                             cola_busq_1.append(cola_espera_1.pop())
-                        print(cl_comp["client"] + "realizo su compra")
+                        print(cl_comp["client"] + "  realizo su compra")
                     
 
                     #PONER MANERA DE AVANZAR TIEMPO AUNQUE NO HAYAN CLIENTES EN LAS COLAS      
@@ -286,7 +320,10 @@ def main():
                 #simulacion entrada random de clientes
 
                 #generamos la cantidad
-                cant=random.randint(1,3) #np.random.normal(media,dist) no puede ser neg
+                if(len(clients)>=3):
+                    cant=random.randint(1,3) #np.random.normal(media,dist) no puede ser neg
+                else:
+                    cant=len(clients)
 
                 client_select=[]
                 #sacamos de manera random del array de clientes
@@ -313,7 +350,7 @@ def main():
 
 
                         people_in_2=people_in_2+1
-                        print("people in store 2" + str(people_in_2) )
+                        print("people in store 2: " + str(people_in_2) )
                     else:
                         cola_espera_2.append(x)
                         print(x+" entro a la cola de espera")
@@ -345,7 +382,7 @@ def main():
 
 
                 #CICLO DE BUSQUEDA Y COMPRA
-                limite_tiempo=15 #sacar despues cual seria buena en MINUTOS FIJO
+               
                 tiempo_trans=0 #tiempo que transcurre en MINUTOS/ EMPIEZA EN 0 #tiene que trancurrir el tiempo
 
 
@@ -367,8 +404,9 @@ def main():
                             prod=store_prod_2.pop()
 
                             max_cant_prod=prod["stock"]
-                            quantity=random.randint(1,max_cant_prod) #np.random.normal(media,dist) no puede ser 0 y tiene que ser menos que el stock maximo que se tiene
-
+                            rnd=int((prod["stock"]/2)+1)
+                            quantity=random.randint(1,rnd) 
+                            
 
 
                             n={
@@ -378,8 +416,8 @@ def main():
 
 
                             prod_list.append(n)
-                            tiempo_trans=tiempo_trans + 1 #"1 minuto por cada producto o algo asi" 
-                            time_s_2=time_s_2+datetime.timedelta(minutes=1)
+                            tiempo_trans=tiempo_trans + sum_time #"1 minuto por cada producto o algo asi" 
+                            time_s_2=time_s_2+datetime.timedelta(minutes=sum_time)
                             
 
                             new_stock_prod=max_cant_prod-quantity
@@ -422,12 +460,14 @@ def main():
 
 
                         people_in_2=people_in_2-1
-                        tiempo_trans=tiempo_trans + len(cl_comp["list"]) #"1 minuto por cada producto o algo asi" 
-                        time_s_2=time_s_2+datetime.timedelta(minutes=len(cl_comp["list"]))
+                        minutes_buy=len(cl_comp["list"])*sum_time
+                        tiempo_trans=tiempo_trans +minutes_buy  #"1 minuto por cada producto o algo asi" 
+                        
+                        time_s_2=time_s_2+datetime.timedelta(minutes=minutes_buy)
 
                         if (len(cola_espera_2)!=0):
                             cola_busq_2.append(cola_espera_2.pop())
-                        print(cl_comp["client"] + "realizo su compra")
+                        print(cl_comp["client"] + "  realizo su compra")
                     
 
                     #PONER MANERA DE AVANZAR TIEMPO AUNQUE NO HAYAN CLIENTES EN LAS COLAS      
@@ -439,7 +479,9 @@ def main():
 
 
         #EMPIEZA BUSQUEDA Y COMPRA EXPRESS DE LA TIENDA 1
-        while(cola_busq_1!=0 and cola_compra_1!=0):
+        while(len(cola_busq_1)!=0 and len(cola_compra_1)!=0 and len(clients)!=0):
+
+            print('CICLO FINAL DIA')
 
             if(len(cola_busq_1)!=0):
                 #Todavia falta
@@ -456,7 +498,9 @@ def main():
                     prod=store_prod_1.pop()
 
                     max_cant_prod=prod["stock"]
-                    quantity=random.randint(1,max_cant_prod) #np.random.normal(media,dist) no puede ser 0 y tiene que ser menos que el stock maximo que se tiene
+                    rnd=int((prod["stock"]/2)+1)
+                    quantity=random.randint(1,rnd) 
+                    
 
                     n={
                         "prod":prod["name"], #nombre del prod
@@ -502,11 +546,11 @@ def main():
                 people_in_1=people_in_1-1
                 time_s_1=time_s_1+datetime.timedelta(minutes=1)
 
-                print(cl_comp["client"] + "realizo su compra")
+                print(cl_comp["client"] + " realizo su compra")
 
 
         #EMPIEZA BUSQUEDA Y COMPRA EXPRESS DE LA TIENDA 2
-        while(cola_busq_2!=0 and cola_compra_2!=0):
+        while(len(cola_busq_2)!=0 and len(cola_compra_2)!=0 and len(clients)!=0):
 
             if(len(cola_busq_2)!=0):
                 #Todavia falta
@@ -523,8 +567,8 @@ def main():
                     prod=store_prod_2.pop()
 
                     max_cant_prod=prod["stock"]
-                    quantity=random.randint(1,max_cant_prod) #np.random.normal(media,dist) no puede ser 0 y tiene que ser menos que el stock maximo que se tiene
-
+                    rnd=int((prod["stock"]/2)+1)
+                    quantity=random.randint(1,rnd) 
                     n={
                         "prod":prod["name"], #nombre del prod
                         "quantity":quantity #la cantidad del producto que se toma
@@ -569,7 +613,7 @@ def main():
                 people_in_2=people_in_2-1
                 time_s_2=time_s_2+datetime.timedelta(minutes=1)
 
-                print(cl_comp["client"] + "realizo su compra")
+                print(cl_comp["client"] + "  realizo su compra")
         
 
 
@@ -628,7 +672,7 @@ def  get_latest_time_1():
         }
         
 
-    print(x)
+    #print(x)
 
     return x
 
@@ -655,7 +699,7 @@ def  get_latest_time_2():
         }
         
 
-    print(x)
+    #print(x)
 
     return x    
 
@@ -668,7 +712,7 @@ def get_clients():
     lista = []
     for index, row in df.iterrows():
         lista.append(row["ci"])
-    print(lista)
+    #print(lista)
     return lista
 
 def get_open_close_1():
@@ -689,7 +733,7 @@ def get_open_close_1():
         }
         
 
-    print(x)  
+    #print(x)  
 
     return x
 
@@ -711,7 +755,7 @@ def get_open_close_2():
         }
         
 
-    print(x)
+    #print(x)
 
     return x  #x     
 #PUEDE SER SOLO UNA
@@ -727,7 +771,7 @@ def get_max_in_1():
 
     for index, row in df.iterrows():
         cant_max=(row["max_people"])
-    print(cant_max)
+    #print(cant_max)
 
     return cant_max #cant_max
 
@@ -743,7 +787,7 @@ def get_max_in_2():
 
     for index, row in df.iterrows():
         cant_max=(row["max_people"])
-    print(cant_max)
+    #print(cant_max)
 
     return cant_max #cant_max
 
@@ -776,9 +820,10 @@ def get_prod_1():
             "shelf_id":row["_id"],
             "max":row["capacity"]
         }
-        lista.append(p)
+        if(p["stock"]>1):
+            lista.append(p)
         
-    print(lista)
+    #print(lista)
 
     return lista 
 
@@ -806,14 +851,14 @@ def get_prod_2():
 
     for index, row in df.iterrows():
         p={
-            "prod":row["name"],
+            "name":row["name"],
             "stock":row["qty_available"],
             "shelf_id":row["_id"],
             "max":row["capacity"]
         }
-        lista.append(p)
-        
-    print(lista)
+        if(p["stock"]>1):
+            lista.append(p)        
+    #print(lista)
 
     return lista
 
@@ -847,7 +892,7 @@ def get_shelf_temp_1():
         }
         lista.append(p)
         
-    print(lista)
+    #print(lista)
 
     
 
@@ -883,7 +928,7 @@ def get_shelf_temp_2():
         }
         lista.append(p)
         
-    print(lista)
+    #print(lista)
 
     
 
@@ -900,7 +945,7 @@ def cuenta():
     else:
         cuenta="Provincial"
     
-    print(cuenta)
+    #print(cuenta)
 
     return cuenta 
 

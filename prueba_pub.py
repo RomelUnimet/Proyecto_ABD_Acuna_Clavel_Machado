@@ -25,16 +25,16 @@ def get_prod_1():
             select p."name", i."qty_available",s."_id",s."capacity",i."datetime"  from plaza."product" as p
             inner join plaza.shelf as s on s."product_name"=p."name"
             inner join plaza.in_stock as i on s."_id"=i."shelf_id"
-            where p."id_store"=2 and
-                  s."id_store"=2 and
-                  i."id_store"=2 and
+            where p."id_store"=1 and
+                  s."id_store"=1 and
+                  i."id_store"=1 and
                   i."datetime"= (
 
                       select max(plaza.in_stock."datetime") from plaza.in_stock
                       inner join  plaza.shelf as sh on plaza.in_stock."shelf_id"= sh."_id"
                       where sh."product_name"=p."name" and
-                            sh."id_store"=2 and
-                            p."id_store"=2
+                            sh."id_store"=1 and
+                            p."id_store"=1
                   )
     '''
     df = pd.read_sql_query(sql, conn)
@@ -146,20 +146,7 @@ clientmqtt.connect(host=host_pub)
 
 def main():
 
-    payload={
-        "shelf_id":7,
-        "id_store":1,
-        "datetime":str(datetime.datetime.now()),
-        "temp_actual":-14,
-        "min_temp":-19
-    }
-    #for x in range(2):
-        #print('-------------------------------------------------------------------------')
-    time.sleep(0.5)
-
-    clientmqtt.publish('Plazas/shelf_temperature/'+str(1) ,json.dumps(payload),qos=0)     
-    #x=abs(payload["min_temp"]-payload["temp_actual"])
-    #print(x)
+    get_prod_1()
 
 
 if __name__ == '__main__':
