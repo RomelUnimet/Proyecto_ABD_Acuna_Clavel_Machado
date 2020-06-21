@@ -194,22 +194,7 @@ def createTriggerUpdateTotal():
 
 
 
-# cur = conn.cursor()
-# cur.execute("DROP TRIGGER addMembership ON plaza.bill")
-# cur.close()
-# conn.commit()
-# cur = conn.cursor()
-# cur.execute("DROP TRIGGER updateTotal ON plaza.bill_product")
-# cur.close()
-# conn.commit()
-# cur = conn.cursor()
-# cur.execute("DROP TRIGGER addPointsWhenPurchase ON plaza.bill_product")
-# cur.close()
-# conn.commit()
-# cur = conn.cursor()
-# cur.execute("DROP TRIGGER addPointWhenVisit ON plaza.visit")
-# cur.close()
-# conn.commit()
+
 
 
 
