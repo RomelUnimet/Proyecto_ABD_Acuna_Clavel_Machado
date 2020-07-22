@@ -11,10 +11,10 @@ import psycopg2 as psy
 import pandas as pd
 
 
-host='drona.db.elephantsql.com'
-user ='ftuzkdcj'
-password='7UHxXzyMvKwsIqOa9nnC8frDFsesnn6U'
-dbname='ftuzkdcj'
+host='ruby.db.elephantsql.com'
+user ='fvhavaif'
+password='THCA_nW8eWwmkuQ4mkobpS0qvZNLEYzE'
+dbname='fvhavaif'
 
 conn=psy.connect(host=host, user=user, password=password, dbname=dbname)
 
@@ -41,8 +41,8 @@ def on_message_camera(client, userdata, message):
     print(a) 
 
     cur = conn.cursor()                             
-    cur.execute("INSERT INTO plaza.visit (client_ci, id_store, datetime) VALUES (%s, %s, %s);",
-                (a["ci"],a["id_store"],a["datetime"]))
+    cur.execute("INSERT INTO ventas.visit (client_ci, id_store, datetime) VALUES (%s, %s, %s);",
+                (a["ci"],a["store"],a["datetime"]))
     conn.commit()
 
     #INSERTAMOS LA VISITA DEL CLIENTE
@@ -60,7 +60,7 @@ def on_message_stock(client, userdata, message):
     print(a) 
 
     cur = conn.cursor()                             
-    cur.execute("INSERT INTO plaza.in_stock (shelf_id, id_store, datetime,qty_available) VALUES (%s, %s, %s, %s);",
+    cur.execute("INSERT INTO inventario.in_stock (shelf_id, id_store, datetime,qty_available) VALUES (%s, %s, %s, %s);",
                 (a["shelf_id"],a["id_store"],a["datetime"],a["qty_available"]))
     conn.commit()    
 
@@ -97,7 +97,7 @@ def on_message_restock(client, userdata, message):
     print(a) 
 
     cur = conn.cursor()                             
-    cur.execute("INSERT INTO plaza.restock (shelf_id, id_store, datetime) VALUES (%s, %s, %s);",
+    cur.execute("INSERT INTO inventario.restock (shelf_id, id_store, datetime) VALUES (%s, %s, %s);",
                 (a["shelf_id"],a["id_store"],a["datetime"]))
     conn.commit()  
 
@@ -107,7 +107,7 @@ def on_message_restock(client, userdata, message):
 
 
     cur = conn.cursor()                             
-    cur.execute("INSERT INTO plaza.in_stock (shelf_id, id_store, datetime,qty_available) VALUES (%s, %s, %s, %s);",
+    cur.execute("INSERT INTO inventario.in_stock (shelf_id, id_store, datetime,qty_available) VALUES (%s, %s, %s, %s);",
                (a["shelf_id"],a["id_store"],var,a["max"]))
     conn.commit()   
 
@@ -123,7 +123,7 @@ def on_message_shelf_temp(client, userdata, message):
     clientmqtt.connect(host=host_pub)
 
     cur = conn.cursor()                             
-    cur.execute("INSERT INTO plaza.temperature (shelf_id, id_store, datetime,temperature) VALUES (%s, %s, %s, %s);",
+    cur.execute("INSERT INTO inventario.temperature (shelf_id, id_store, datetime,temperature) VALUES (%s, %s, %s, %s);",
                 (a["shelf_id"],a["id_store"],a["datetime"],a["temp_actual"]))
     conn.commit()   
 
@@ -152,7 +152,7 @@ def on_message_fix_temp(client, userdata, message):
     var=var+datetime.timedelta(seconds=1)
 
     cur = conn.cursor()                             
-    cur.execute("INSERT INTO plaza.temperature (shelf_id, id_store, datetime,temperature) VALUES (%s, %s, %s, %s);",
+    cur.execute("INSERT INTO inventario.temperature (shelf_id, id_store, datetime,temperature) VALUES (%s, %s, %s, %s);",
                 (a["shelf_id"],a["id_store"],var,a["min_temp"]))
     conn.commit()   
 

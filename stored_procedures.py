@@ -1,3 +1,9 @@
+# IMPORTANTE.
+# Se recomienda correr el archivo de jupyter notebook donde aparecen los stored procedures hechos aquí también, ya que 
+# los resultados se muestran de una manera más organizada.
+# El primer procedimiento almacenado solo se encuentra en este archivo.
+
+
 import psycopg2
 import datetime
 import json

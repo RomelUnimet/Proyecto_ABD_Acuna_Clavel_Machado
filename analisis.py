@@ -1,3 +1,9 @@
+# IMPORTANTE.
+# Se recomienda correr el archivo de jupyter notebook donde aparecen los análisis hechos aquí también, ya que los resultados se 
+# muestran de una manera más organizada.
+# La tercera pregunta de análisis solo se encuentra en este archivo.
+
+
 import psycopg2
 
 # Connect to de DB
