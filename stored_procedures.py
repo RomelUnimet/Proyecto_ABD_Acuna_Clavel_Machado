@@ -4,10 +4,10 @@ import json
 
 # Connect to de DB
 conn = psycopg2.connect(
-    host='drona.db.elephantsql.com',
-    user ='ftuzkdcj',
-    password='7UHxXzyMvKwsIqOa9nnC8frDFsesnn6U',
-    database='ftuzkdcj'
+    host='ruby.db.elephantsql.com',
+    user ='fvhavaif',
+    password='THCA_nW8eWwmkuQ4mkobpS0qvZNLEYzE',
+    database='fvhavaif'
 )
 
 def select(query):
@@ -26,7 +26,7 @@ def select(query):
 
 #Para este procedimiento se crea un nuevo type en la base de datos.
 def createCart():
-    query = """ CREATE TYPE plaza.cart AS (product VARCHAR(30), qty INTEGER); """
+    query = """ CREATE TYPE ventas.cart AS (product VARCHAR(30), qty INTEGER); """
     cur = conn.cursor()
     cur.execute(query)
     cur.close()
@@ -36,7 +36,7 @@ def createCart():
 #Luego se realiza la función de compra
 def buyProcedure(product, bank, ci_client, date_transaction, store):
 
-    query=""" CREATE OR REPLACE FUNCTION plaza.shop (product plaza.cart[], bank varchar(15), ci_client varchar(20), date_transaction timestamp,
+    query=""" CREATE OR REPLACE FUNCTION ventas.shop (product ventas.cart[], bank varchar(15), ci_client varchar(20), date_transaction timestamp,
     store integer)
     RETURNS void AS $$ 
     DECLARE
@@ -44,10 +44,10 @@ def buyProcedure(product, bank, ci_client, date_transaction, store):
     BEGIN
     
         IF array_length(product, 1) > 0 THEN
-            INSERT INTO plaza.bill (client_ci, id_store, account, datetime, total)
+            INSERT INTO ventas.bill (client_ci, id_store, account, datetime, total)
             VALUES (ci_client, store, bank, date_transaction, 0) RETURNING _id INTO bill;
 
-            INSERT INTO plaza.bill_product(bill_id,  product_name, id_store, quantity)
+            INSERT INTO ventas.bill_product(bill_id,  product_name, id_store, quantity)
             SELECT bill, c.product, store, c.qty FROM UNNEST(product) AS c;
         ELSE
             RAISE EXCEPTION 'The cart is empty or null %', now();
@@ -60,7 +60,7 @@ def buyProcedure(product, bank, ci_client, date_transaction, store):
     cur.close()
     conn.commit()
 
-    query = f""" SELECT plaza.shop(array{product}::plaza.cart[], '{bank}', '{ci_client}', '{date_transaction}', '{store}')"""
+    query = f""" SELECT ventas.shop(array{product}::ventas.cart[], '{bank}', '{ci_client}', '{date_transaction}', '{store}')"""
     cur = conn.cursor()
     cur.execute(query)
     cur.close()
@@ -79,7 +79,7 @@ def buyProcedure(product, bank, ci_client, date_transaction, store):
 
 #Procedimiento 2:
 def account_state(curr_day):
-    query=""" CREATE OR REPLACE FUNCTION plaza.account_state (curr_day timestamp)
+    query=""" CREATE OR REPLACE FUNCTION ventas.account_state (curr_day timestamp)
     RETURNS TABLE (bank varchar(15), balance numeric(32,2), date_meassured date ) AS $$
     DECLARE
         x RECORD;
@@ -90,9 +90,9 @@ def account_state(curr_day):
 
         FOREACH i IN ARRAY banks LOOP
             bank:= i;
-            IF i IN ( SELECT account FROM plaza.bill AS b 
+            IF i IN ( SELECT account FROM ventas.bill AS b 
                         WHERE DATE(datetime) <= DATE(curr_day) ) THEN
-                            SELECT SUM(total) INTO aux FROM plaza.bill WHERE account=i AND 
+                            SELECT SUM(total) INTO aux FROM ventas.bill WHERE account=i AND 
                             DATE(datetime) <= DATE(curr_day);
                             balance:=aux;
                             date_meassured := curr_day;
@@ -112,7 +112,7 @@ def account_state(curr_day):
     conn.commit()
 
     
-    query = f""" SELECT * FROM plaza.account_state('{curr_day}') """
+    query = f""" SELECT * FROM ventas.account_state('{curr_day}') """
     print(select(query))
 # UNCOMMENT THE LINE BELOW TO RUN THE FUNCTION.
 #account_state(datetime.datetime.now())
@@ -122,7 +122,7 @@ def account_state(curr_day):
 def clients_points_state(last_date_month):
 
     print(type(last_date_month))
-    query = """ CREATE OR REPLACE FUNCTION plaza.client_points_state (last_date_month timestamp)
+    query = """ CREATE OR REPLACE FUNCTION ventas.client_points_state (last_date_month timestamp)
  RETURNS TABLE (loyal_client varchar(50), points INTEGER) AS $$ 
  DECLARE 
      X RECORD;
@@ -132,10 +132,10 @@ def clients_points_state(last_date_month):
 	SELECT (date_trunc('MONTH', DATE(last_date_month)) + INTERVAL '1 month' - INTERVAL '1 day')::date INTO last_d;
 	 
 	IF EXTRACT(DAY FROM last_date_month) = EXTRACT(DAY FROM last_d) THEN
-		 FOR X IN (SELECT DISTINCT CONCAT(c.name, ' ', c.last_name) AS full_name, m.points AS pts FROM plaza.membership AS m 
-		 INNER JOIN plaza.bill AS b ON m.ci = b.client_ci 
-		 INNER JOIN plaza.client AS c ON c.ci = m.ci
-		 WHERE c.ci IN (SELECT client_ci FROM plaza.bill WHERE datetime > last_date_month - INTERVAL '1 month' 
+		 FOR X IN (SELECT DISTINCT CONCAT(c.name, ' ', c.last_name) AS full_name, m.points AS pts FROM ventas.membership AS m 
+		 INNER JOIN ventas.bill AS b ON m.ci = b.client_ci 
+		 INNER JOIN ventas.client AS c ON c.ci = m.ci
+		 WHERE c.ci IN (SELECT client_ci FROM ventas.bill WHERE datetime > last_date_month - INTERVAL '1 month' 
 		 AND datetime < last_date_month + INTERVAL '1 day') ORDER BY pts DESC) LOOP 
 			 loyal_client:= X.full_name;
 			 points:= X.pts;
@@ -152,7 +152,7 @@ def clients_points_state(last_date_month):
     cur.close()
     conn.commit()
 
-    query = f"""SELECT * FROM plaza.client_points_state('{last_date_month}');"""
+    query = f"""SELECT * FROM ventas.client_points_state('{last_date_month}');"""
     print(select(query))
 # UNCOMMENT THE LINE BELOW TO RUN THE FUNCTION.
 #clients_points_state('2020-06-04')
@@ -160,17 +160,17 @@ def clients_points_state(last_date_month):
 
 def update_prices(d):
 
-    query = """ CREATE OR REPLACE FUNCTION plaza.update_prices (d timestamp)
+    query = """ CREATE OR REPLACE FUNCTION ventas.update_prices (d timestamp)
     RETURNS void 
     AS $$ 
     DECLARE 
         X RECORD;
     BEGIN
 	
-		FOR X IN (SELECT date AS fe, id_store, product_name, price, cost FROM plaza.price as pBig WHERE date = 
-				 (SELECT MAX(date) FROM plaza.price AS pS WHERE pBig.product_name = pS.product_name AND pBig.id_store = pS.id_store)
+		FOR X IN (SELECT date AS fe, id_store, product_name, price, cost FROM ventas.price as pBig WHERE date = 
+				 (SELECT MAX(date) FROM ventas.price AS pS WHERE pBig.product_name = pS.product_name AND pBig.id_store = pS.id_store)
 				 GROUP BY product_name, id_store, price, date) LOOP
-					INSERT INTO plaza.price VALUES (DATE(d), X.id_store, X.product_name, X.price*1.05, X.cost*1.05);
+					INSERT INTO ventas.price VALUES (DATE(d), X.id_store, X.product_name, X.price*1.05, X.cost*1.05);
 				 END LOOP;
     END;
     $$ 
@@ -181,7 +181,7 @@ def update_prices(d):
     cur.close()
     conn.commit()
 
-    query = f""" SELECT plaza.update_prices('{d}')"""
+    query = f""" SELECT ventas.update_prices('{d}')"""
     cur = conn.cursor()
     cur.execute(query)
     cur.close()
