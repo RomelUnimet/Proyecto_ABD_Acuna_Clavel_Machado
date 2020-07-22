@@ -1,12 +1,12 @@
 // TOTY
-  // {
-  //     "python.pythonPath": "C:\\Users\\romel\\AppData\\Local\\Programs\\Python\\Python38\\python.exe"
-  // }
+   {
+       "python.pythonPath": "C:\\Users\\romel\\AppData\\Local\\Programs\\Python\\Python38\\python.exe"
+   }
 
 // VICS
-{
-    "python.pythonPath": "/usr/local/bin/python3"
-}
+//{
+//    "python.pythonPath": "/usr/local/bin/python3"
+//}
 
 // WIL
 //{

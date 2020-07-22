@@ -12,10 +12,10 @@ import pandas as pd
 import stored_procedures as sp 
 
 
-host='drona.db.elephantsql.com'
-user ='ftuzkdcj'
-password='7UHxXzyMvKwsIqOa9nnC8frDFsesnn6U'
-dbname='ftuzkdcj'
+host='ruby.db.elephantsql.com'
+user ='fvhavaif'
+password='THCA_nW8eWwmkuQ4mkobpS0qvZNLEYzE'
+dbname='fvhavaif'
 
 conn=psy.connect(host=host, user=user, password=password, dbname=dbname)
 
@@ -648,18 +648,21 @@ def main():
         time_s_1=dia_desp_1
         time_s_2=dia_desp_2
        
-
+#=================================================================================================================================
 def  get_latest_time_1():
     
     sql='''
             select  EXTRACT(DAY from b."datetime") as day, 
                     EXTRACT(MONTH from b."datetime") as month, 
                     EXTRACT(YEAR from b."datetime") as year
-            from plaza.bill as b 
+            from ventas.bill as b
             where b."id_store"=1 
             order by b."datetime" desc 
             limit 1;
     '''
+    #from plaza.bill as b 
+    #from ventas.bill as b 
+
 
     df = pd.read_sql_query(sql, conn)
 
@@ -682,11 +685,13 @@ def  get_latest_time_2():
             select  EXTRACT(DAY from b."datetime") as day, 
                     EXTRACT(MONTH from b."datetime") as month, 
                     EXTRACT(YEAR from b."datetime") as year
-            from plaza.bill as b 
+            from ventas.bill as b
             where b."id_store"=2 
             order by b."datetime" desc 
             limit 1;
     '''
+    #from plaza.bill as b 
+    #from app_ventas.bill as b 
 
     df = pd.read_sql_query(sql, conn)
 
@@ -705,9 +710,13 @@ def  get_latest_time_2():
 
 def get_clients():
     sql=''' 
-            select c."ci" from plaza.client as c
+            select c."ci" from ventas.client as c
 
     '''    
+
+    #from plaza.client as c
+    #from ventas.client as c
+
     df = pd.read_sql_query(sql, conn)
     lista = []
     for index, row in df.iterrows():
@@ -718,10 +727,12 @@ def get_clients():
 def get_open_close_1():
     
     sql='''
-            select s."opening", s."closing" from plaza.store as s
+            select s."opening", s."closing" from ventas.store as s
             where s."_id"=1
     
     '''
+    #from plaza.store as s 
+    #from ventas.store as s
     
     df = pd.read_sql_query(sql, conn)
 
@@ -740,10 +751,13 @@ def get_open_close_1():
 def get_open_close_2():
 
     sql='''
-            select s."opening", s."closing" from plaza.store as s
+            select s."opening", s."closing" from ventas.store as s
             where s."_id"=2
     
     '''
+
+    #from plaza.store as s 
+    #from app_ventas.store as s
     
     df = pd.read_sql_query(sql, conn)
 
@@ -762,9 +776,11 @@ def get_open_close_2():
 def get_max_in_1():
     
     sql='''
-            select s."max_people" from plaza.store as s 
+            select s."max_people" from ventas.store as s
             where s."_id"=1
         '''
+        #from plaza.store as s 
+        #from ventas.store as s
     
     df = pd.read_sql_query(sql, conn)
 
@@ -778,9 +794,11 @@ def get_max_in_1():
 def get_max_in_2():
 
     sql='''
-            select s."max_people" from plaza.store as s 
+            select s."max_people" from ventas.store as s 
             where s."_id"=2
         '''
+        #from plaza.store as s 
+        #from app_ventas.store as s
     
     df = pd.read_sql_query(sql, conn)
 
@@ -794,21 +812,31 @@ def get_max_in_2():
 def get_prod_1():
     
     sql='''
-            select p."name", i."qty_available",s."_id",s."capacity"  from plaza."product" as p
-            inner join plaza.shelf as s on s."product_name"=p."name"
-            inner join plaza.in_stock as i on s."_id"=i."shelf_id"
+            select p."name", i."qty_available",s."_id",s."capacity"  from inventario."product" as p
+            inner join inventario.shelf as s on s."product_name"=p."name"
+            inner join inventario.in_stock as i on s."_id"=i."shelf_id"
             where p."id_store"=1 and
                   s."id_store"=1 and
                   i."id_store"=1 and
                   i."datetime"= (
 
-                      select max(plaza.in_stock."datetime") from plaza.in_stock
-                      inner join  plaza.shelf as sh on plaza.in_stock."shelf_id"= sh."_id"
+                      select max(plaza.in_stock."datetime") from inventario.in_stock
+                      inner join  inventario.shelf as sh on inventario.in_stock."shelf_id"= sh."_id"
                       where sh."product_name"=p."name" and
                             sh."id_store"=1 and
                             p."id_store"=1
                   )
     '''
+
+    #from plaza."product" as p => from app_restock."product" as p
+    #plaza.shelf as s =>  app_restock.shelf as s
+    #plaza.in_stock as i  =>  app_restock.in_stock as i 
+
+    #select extra => from plaza.in_stock => from app_restock.in_stock //  plaza.shelf as sh =>  app_restock.shelf as sh
+    
+    
+    
+    
     df = pd.read_sql_query(sql, conn)
 
     lista=[]
@@ -830,21 +858,29 @@ def get_prod_1():
 def get_prod_2():
     
     sql='''
-            select p."name", i."qty_available",s."_id",s."capacity"  from plaza."product" as p
-            inner join plaza.shelf as s on s."product_name"=p."name"
-            inner join plaza.in_stock as i on s."_id"=i."shelf_id"
+            select p."name", i."qty_available",s."_id",s."capacity"  from inventario."product" as p
+            inner join inventario.shelf as s on s."product_name"=p."name"
+            inner join inventario.in_stock as i on s."_id"=i."shelf_id"
             where p."id_store"=2 and
                   s."id_store"=2 and
                   i."id_store"=2 and
                   i."datetime"= (
 
-                      select max(plaza.in_stock."datetime") from plaza.in_stock
-                      inner join  plaza.shelf as sh on plaza.in_stock."shelf_id"= sh."_id"
+                      select max(plaza.in_stock."datetime") from inventario.in_stock
+                      inner join  inventario.shelf as sh on inventario.in_stock."shelf_id"= sh."_id"
                       where sh."product_name"=p."name" and
                             sh."id_store"=2 and
                             p."id_store"=2
                   )
     '''
+
+    #from plaza."product" as p => from app_restock."product" as p
+    #plaza.shelf as s =>  app_restock.shelf as s
+    #plaza.in_stock as i  =>  app_restock.in_stock as i 
+
+    #select extra => from plaza.in_stock => from app_restock.in_stock //  plaza.shelf as sh =>  app_restock.shelf as sh
+    
+
     df = pd.read_sql_query(sql, conn)
 
     lista=[]
@@ -865,12 +901,12 @@ def get_prod_2():
 def get_shelf_temp_1():
     sql='''
             select t."shelf_id", t."id_store",t."datetime",t."temperature",s."min_temperature"
-            from plaza.temperature as t
-            inner join plaza.shelf as s on s."_id"=t."shelf_id"
+            from inventario.temperature as t
+            inner join inventario.shelf as s on s."_id"=t."shelf_id"
             where t."id_store"=1 and 
                   s."id_store"=1 and 
                   t.datetime =(
-                                    select max(temp."datetime") from plaza.temperature as temp
+                                    select max(temp."datetime") from inventario.temperature as temp
                                     where  temp."shelf_id"=t."shelf_id" and
                                            temp.id_store=1 
 
@@ -878,6 +914,12 @@ def get_shelf_temp_1():
     
     
     '''
+    # plaza.temperature as t => app_restock.temperature as t
+    # plaza.shelf as s => app_restock.shelf as s
+
+    #Extra plaza.temperature as temp  => app_restock.temperature as temp
+
+
     df = pd.read_sql_query(sql, conn)
 
     lista=[]
@@ -901,12 +943,12 @@ def get_shelf_temp_1():
 def get_shelf_temp_2():
     sql='''
             select t."shelf_id", t."id_store",t."datetime",t."temperature",s."min_temperature"
-            from plaza.temperature as t
-            inner join plaza.shelf as s on s."_id"=t."shelf_id"
+            from inventario.temperature as t
+            inner join inventario.shelf as s on s."_id"=t."shelf_id"
             where t."id_store"=2 and 
                   s."id_store"=2 and 
                   t.datetime =(
-                                    select max(temp."datetime") from plaza.temperature as temp
+                                    select max(temp."datetime") from inventario.temperature as temp
                                     where  temp."shelf_id"=t."shelf_id" and
                                            temp.id_store=2
 
@@ -914,6 +956,12 @@ def get_shelf_temp_2():
     
     
     '''
+
+    # plaza.temperature as t => app_restock.temperature as t
+    # plaza.shelf as s => app_restock.shelf as s
+
+    #Extra plaza.temperature as temp  => app_restock.temperature as temp
+
     df = pd.read_sql_query(sql, conn)
 
     lista=[]
